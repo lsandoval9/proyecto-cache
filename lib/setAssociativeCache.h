@@ -43,9 +43,11 @@ public:
 
     this->sets_in_cache = this->blocks_in_cache / this->n_ways;
 
-    this->bitsInTag = ADDRESS_SIZE - bitsInSet - bitsInOffset;
-
     this->sets_in_cache = this->blocks_in_cache / this->n_ways;
+
+    this->bitsInSet = log2(this->sets_in_cache);
+
+    this->bitsInTag = ADDRESS_SIZE - bitsInSet - bitsInOffset;
 
     this->initializeCache();
   }
@@ -54,7 +56,7 @@ public:
    * Guarda un bloque en la caché
    * @param binaryAddress dirección en binario de 32 bits
    */
-  void saveBlockInCache(long binaryAddress)
+  bool saveBlockInCache(long binaryAddress)
   {
 
     CacheRequest *request = new CacheRequest(binaryAddress, this->bitsInOffset, this->bitsInSet);
@@ -68,10 +70,15 @@ public:
     offset = request->getOffset();
 
     address = request->getBinaryAddress();
+    
+    std::cout << "Address: "; BaseNParser::printLongInBinary(address, ADDRESS_SIZE); std::cout << endl;
+    std::cout << "Tag: "; BaseNParser::printLongInBinary(tag, this->bitsInTag); std::cout << endl;
+    std::cout << "Set: "; BaseNParser::printLongInBinary(set, this->bitsInSet); std::cout << endl;
+    std::cout << "Offset: "; BaseNParser::printLongInBinary(offset, this->bitsInOffset); cout << endl;
 
     bool inserted = false;
 
-    // insert bits in cache using LRU
+    bool isHit = false;
 
     size_t lessRecent = 0;
 
@@ -81,6 +88,20 @@ public:
     {
 
       bool valid = this->cache[i].getValid();
+
+      if (valid && this->cache[i].getTag() == tag)
+      {
+
+        this->cache[i].setAccessTime(this->access_time);
+
+        this->access_time++;
+
+        inserted = true;
+
+        isHit = true;
+
+        break;
+      }
 
       if (!valid)
       {
@@ -99,12 +120,16 @@ public:
 
         break;
       }
-
+      
+      
       if (this->cache[i].getAccessTime() < this->cache[lessRecent].getAccessTime())
       {
 
         lessRecent = i;
       }
+
+      
+
     }
 
     if (!inserted)
@@ -120,16 +145,22 @@ public:
 
       this->access_time++;
     }
+
+    string status = isHit ? "hit" : "miss";
+
+    std::cout << "Hit/Miss: " << status;
+
+    return isHit;
   }
 
   void initializeCache()
   {
 
-    cout << "Bloques en cache: " << this->blocks_in_cache << endl;
+    std::cout << "Bloques en cache: " << this->blocks_in_cache << endl;
 
-    cout << "Conjuntos en cache: " << this->sets_in_cache << endl;
+    std::cout << "Conjuntos en cache: " << this->sets_in_cache << endl;
 
-    cout << "Bits en offset: " << this->bitsInSet << endl;
+    std::cout << "Bits en offset: " << this->bitsInSet << endl;
 
     this->cache = vector<CacheLine>(this->blocks_in_cache);
 

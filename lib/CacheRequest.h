@@ -87,19 +87,19 @@ public:
   void printRequest()
   {
     std::cout << "Address: ";
-    printBits(this->binaryAddress, ADDRESS_SIZE);
+    BaseNParser::printLongInBinary(this->binaryAddress, ADDRESS_SIZE);
     std::cout << std::endl;
 
     std::cout << "Tag: ";
-    printBits(this->tag, this->bitsInTag);
+    BaseNParser::printLongInBinary(this->tag, this->bitsInTag);
     std::cout << std::endl;
 
     std::cout << "Set: ";
-    printBits(this->set, this->bitsInSet);
+    BaseNParser::printLongInBinary(this->set, this->bitsInSet);
     std::cout << std::endl;
 
     std::cout << "Offset: ";
-    printBits(this->offset, this->bitsInOffset);
+    BaseNParser::printLongInBinary(this->offset, this->bitsInOffset);
     std::cout << std::endl;
 
   }

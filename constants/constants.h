@@ -10,3 +10,8 @@
 
 #endif
 
+#ifndef WORDS_PER_BLOCK
+
+#define WORDS_PER_BLOCK 4 // Numero de palabras por bloque
+
+#endif

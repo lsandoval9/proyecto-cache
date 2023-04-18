@@ -53,16 +53,20 @@ int main(int argc, char const *argv[])
 
   int input = -1;
 
+  std::cout << "¡Bienvenido al programa de emulacion de una memoria cache! V2.0" << endl;
+  BaseNParser::printLongInBinary(255, 9);
+  std::cout << endl;
+
   setValues();
   readBlocksFromFile();
 
   while (input != 0)
   {
 
-    cout << endl;
+    std::cout << endl;
     printMenu();
     cin >> input;
-    cout << endl;
+    std::cout << endl;
 
     switch (input)
     {
@@ -86,10 +90,10 @@ int main(int argc, char const *argv[])
       finalizarPrograma();
       break;
     default:
-      cout << "¡Opcion invalida!";
+      std::cout << "¡Opcion invalida!";
     }
 
-    sleep(2);
+    sleep(1);
   }
 
   return 0;
@@ -111,15 +115,16 @@ void setValues()
 
   long n_ways; // Numero de vias
 
-  cout << "ingrese el tamaño de la memoria cache en KB (potencia de 2): ";
+  std::cout << "ingrese el tamaño de la memoria cache en KB (potencia de 2): ";
 
   cin >> s_cache;
 
-  cout << "ingrese el tamaño del bloque en palabras (potencia de 2): ";
+  /**
+   * @brief Tamaño del bloque en palabras de 32 bits
+   */
+  s_block = WORDS_PER_BLOCK;
 
-  cin >> s_block;
-
-  cout << "ingrese el numero de vias (potencia de 2): ";
+  std::cout << "ingrese el numero de vias (potencia de 2): ";
 
   cin >> n_ways;
 
@@ -133,11 +138,6 @@ void setValues()
     throw std::runtime_error("¡El tamaño de la memoria cache y el tamaño del bloque deben ser mayores a 0!");
   }
 
-  if (s_cache % s_block != 0)
-  {
-    throw std::runtime_error("¡El tamaño de la memoria cache debe ser multiplo del tamaño del bloque!");
-  }
-
   if (n_ways % 2 != 0)
   {
     throw std::runtime_error("¡El numero de vias debe ser multiplo de 2!");
@@ -145,7 +145,7 @@ void setValues()
 
   long blockInCache = s_cache * 1024 / (s_block * 4);
 
-  cout << "Numero de bloques en la cache12: " << blockInCache << endl;
+  std::cout << "Numero de bloques en la cache12: " << blockInCache << endl;
 
   if (n_ways > blockInCache)
   {
@@ -160,14 +160,14 @@ void setValues()
  */
 void printMenu()
 {
-  cout << "Ingrese la opcion deseada a continuacion(1,2,3,...): " << endl;
-  cout << " 1 - Informacion cache de correspondencia directa" << endl;
-  cout << " 2 - Informacion asociativa por conjuntos" << endl;
-  cout << " 3 - NADA" << endl;
-  cout << " 4 - cambiar valores" << endl;
-  cout << " 5 - acerca del programa" << endl;
-  cout << " 0 - salir" << endl;
-  cout << "seleccion: > ";
+  std::cout << "Ingrese la opcion deseada a continuacion(1,2,3,...): " << endl;
+  std::cout << " 1 - Informacion cache de correspondencia directa" << endl;
+  std::cout << " 2 - Informacion asociativa por conjuntos" << endl;
+  std::cout << " 3 - NADA" << endl;
+  std::cout << " 4 - cambiar valores" << endl;
+  std::cout << " 5 - acerca del programa" << endl;
+  std::cout << " 0 - salir" << endl;
+  std::cout << "seleccion: > ";
 }
 
 /**
@@ -185,7 +185,7 @@ void printFeatures(short option)
 void finalizarPrograma()
 {
 
-  cout << "\nFin del programa";
+  std::cout << "\nFin del programa";
 
   delete globalSetAssociativeCache;
 
@@ -195,21 +195,21 @@ void finalizarPrograma()
 void imprimirInformacion()
 {
 
-  cout << "Programa para emular el funcionamiento de una memoria cache para correspondencia directa y asociativa por conjuntos" << endl;
+  std::cout << "Programa para emular el funcionamiento de una memoria cache para correspondencia directa y asociativa por conjuntos" << endl;
 
-  cout << "Autores: " << endl;
+  std::cout << "Autores: " << endl;
 
-  cout << "Luis Sandoval - 26.781.082" << endl;
+  std::cout << "Luis Sandoval - 26.781.082" << endl;
 
-  cout << "Gerardo Diaz - TODO" << endl;
+  std::cout << "Gerardo Diaz - TODO" << endl;
 
-  cout << "Profesor: Jose Canache" << endl;
+  std::cout << "Profesor: Jose Canache" << endl;
 
-  cout << "Universidad de Carabobo" << endl;
+  std::cout << "Universidad de Carabobo" << endl;
 
-  cout << "Facultad Experimental de Ciencias y Tecnologia" << endl;
+  std::cout << "Facultad Experimental de Ciencias y Tecnologia" << endl;
 
-  cout << "Arquitectura del computador" << endl;
+  std::cout << "Arquitectura del computador" << endl;
 }
 
 /**
@@ -229,7 +229,8 @@ void readBlocksFromFile()
   {
     throw runtime_error("¡No se pudo abrir el archivo!");
   }
-
+  cout << "Leyendo archivo..." << endl;
+  cout << "------------------" << endl;
   while (!myFile.eof())
   {
 
@@ -239,12 +240,28 @@ void readBlocksFromFile()
 
     getline(myFile, input);
 
-    long binaryNumber = BaseNParser::parseHexStringToNumber(input);
+    std::cout << "Memory block: " << input << endl;
 
-    globalSetAssociativeCache->saveBlockInCache(binaryNumber);
+    long number = BaseNParser::parseHexStringToNumber(input);
 
-    cout << "Se guardo el bloque " << input << " en la cache" << endl;
+    globalSetAssociativeCache->saveBlockInCache(number);
+
+    std::cout << endl
+              << "-----------------" << endl;
   }
+
+  long miss_rate = globalSetAssociativeCache->getMissCounter();
+
+  long hit_rate = globalSetAssociativeCache->getHitRate();
+
+  cout << endl
+       << "*******************" << endl;
+
+  std::cout << " - Miss rate: " << miss_rate << "%" << endl;
+
+  std::cout << " - Hit rate: " << hit_rate << "%" << endl;
+
+  cout << "*******************" << endl;
 
   myFile.close();
 }

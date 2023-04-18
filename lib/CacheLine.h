@@ -51,7 +51,7 @@ class CacheLine {
     }
 
     bool getValid() {
-      return true;
+      return this->valid;
     }
 
     long getBlock() {
