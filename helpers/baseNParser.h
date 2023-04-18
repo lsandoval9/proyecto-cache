@@ -1,17 +1,15 @@
 
+#include "../constants/constants.h"
 
 #include <iostream>
 #include <string>
-#include <vector>
 #include <iomanip>
+#include <unistd.h>
+#include <map>
+#include <bitset>
+#include <fstream>
 
 using namespace std;
-
-#ifndef WORD_SIZE
-
-#define WORD_SIZE 32
-
-#endif
 
 #ifndef BASENPARSER_H
 
@@ -26,6 +24,17 @@ private:
 public:
   ~BaseNParser()
   {
+  }
+
+  static long parseHexStringToNumber(string hexString)
+  {
+    
+    long hexNumber = stol(hexString, nullptr, 16);
+
+    cout << "Hex number: " << hexNumber << endl;
+
+    return hexNumber;
+    
   }
 
   static void printHex(long dec)
