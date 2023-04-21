@@ -91,7 +91,6 @@ public:
     {
 
       bool valid = this->cache[i].getValid();
-      cout << "Entrando al for" << endl;
 
       if (valid && this->cache[i].getTag() == tag)
       {
@@ -154,7 +153,7 @@ public:
 
     string hitOrMis = isHit ? "Hit" : "Miss";
 
-    std::cout << "Resultado: " << hitOrMis << endl;
+    std::cout << "H/M: " << hitOrMis << endl;
 
     return isHit;
   }
