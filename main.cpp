@@ -54,9 +54,7 @@ int main(int argc, char const *argv[])
 
   int input = -1;
 
-  std::cout << "¡Bienvenido al programa de emulacion de una memoria cache! V2.0" << endl;
-  BaseNParser::printLongInBinary(255, 9);
-  std::cout << endl;
+  std::cout << "¡Bienvenido al programa de emulacion de una memoria cache!" << endl << endl;
 
   setValues();
   readBlocksFromFile();

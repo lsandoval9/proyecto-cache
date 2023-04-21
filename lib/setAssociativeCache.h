@@ -300,6 +300,10 @@ public:
 
   ~SetAssociativeCache()
   {
+
+    this->cache.clear(); // esto es para eliminar cada elemento. No libera la memoria
+    this->cache.shrink_to_fit(); // Esto es para liberar la memoria
+
   }
 };
 
