@@ -73,8 +73,6 @@ public:
 
   // metodos virtuales puros
 
-  virtual void printFeatures() = 0;
-
   virtual bool saveBlockInCache(long blockAddress) = 0;
 
   // metodos comunes

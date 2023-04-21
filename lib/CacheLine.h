@@ -34,6 +34,7 @@ class CacheLine {
 
     CacheLine(bool valid) {
       this->valid = valid;
+      this->accessTime = -1;
     }
 
     CacheLine(long tag, bool valid, long offset, long set) {

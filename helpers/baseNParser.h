@@ -57,6 +57,29 @@ public:
 
     std::cout << "0b" << std::setfill('0') << std::setw(bits) << binaryStr;
   }
+
+
+  static string getBinaryString(long number, long bits) {
+
+    std::bitset<32> binary(number);             // convierte el número a binario con 32 bits
+    std::string binaryStr = binary.to_string(); // convierte el número binario a una cadena de caracteres
+
+    // si la cantidad de bits es menor a 32, se recorta la cadena para que tenga la cantidad de bits especificada
+    if (bits < 32)
+    {
+      binaryStr = binaryStr.substr(32 - bits);
+    }
+
+    return binaryStr;
+  }
+
+
+  static string toFixedString(double number, int precision ) {
+
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(precision) << number;
+    return out.str();
+  }
 };
 
 #endif

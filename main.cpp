@@ -18,6 +18,7 @@
 #include <map>
 #include <bitset>
 #include <fstream>
+#include <math.h>
 
 using namespace std;
 
@@ -36,13 +37,13 @@ void printMenu();
 
 void setValues();
 
-void printFeatures(short option);
-
 void finalizarPrograma();
 
 void imprimirInformacion();
 
 void readBlocksFromFile();
+
+void writeFeatures();
 
 /**
  * Programa para emular el funcionamiento de una memoria cache para correspondencia directa y
@@ -72,18 +73,16 @@ int main(int argc, char const *argv[])
     {
 
     case 1: // Imprimir prestaciones de la cache
-      printFeatures(1);
-      break;
-    case 2:
-      printFeatures(2);
-      break;
-    case 3:
       readBlocksFromFile();
       break;
-    case 4: // Reiniciar valores
-      setValues();
+    case 2:
+      writeFeatures();
       break;
-    case 5: // imprimir informacion del programa
+    case 3: // Reiniciar valores
+      setValues();
+      readBlocksFromFile();
+      break;
+    case 4: // imprimir informacion del programa
       imprimirInformacion();
       break;
     case 0: // Salir
@@ -93,7 +92,6 @@ int main(int argc, char const *argv[])
       std::cout << "¡Opcion invalida!";
     }
 
-    sleep(1);
   }
 
   return 0;
@@ -115,7 +113,8 @@ void setValues()
 
   long n_ways; // Numero de vias
 
-  std::cout << "ingrese el tamaño de la memoria cache en KB (potencia de 2): ";
+  std::cout << "ingrese el tamaño de la memoria cache en KB (potencia de 2)" << endl;
+  std::cout << "> ";
 
   cin >> s_cache;
 
@@ -124,13 +123,22 @@ void setValues()
    */
   s_block = WORDS_PER_BLOCK;
 
-  std::cout << "ingrese el numero de vias (potencia de 2): ";
+  std::cout << "ingrese el numero de vias (potencia de 2)" << endl;
+  std::cout << "NOTA: 0 es un atajo para completamente asociativa" << endl;
+  std::cout << "> ";
 
   cin >> n_ways;
 
-  if (s_cache % 2 != 0 && s_block % 2 != 0)
+  long blockInCache = s_cache * 1024 / (s_block * 4);
+
+  if (n_ways == 0)
   {
-    throw std::runtime_error("¡El tamaño de la memoria cache y el tamaño del bloque deben ser multiplos de 2!");
+    n_ways = blockInCache;
+  }
+
+  if ((s_block & (s_block - 1)) != 0)
+  {
+    throw std::runtime_error("¡El tamaño de la memoria cache debe ser potencia de 2!");
   }
 
   if (s_cache < 1 || s_block < 1)
@@ -138,14 +146,10 @@ void setValues()
     throw std::runtime_error("¡El tamaño de la memoria cache y el tamaño del bloque deben ser mayores a 0!");
   }
 
-  if (n_ways % 2 != 0)
+  if ((n_ways & (n_ways - 1)) != 0)
   {
     throw std::runtime_error("¡El numero de vias debe ser multiplo de 2!");
   }
-
-  long blockInCache = s_cache * 1024 / (s_block * 4);
-
-  std::cout << "Numero de bloques en la cache12: " << blockInCache << endl;
 
   if (n_ways > blockInCache)
   {
@@ -161,31 +165,18 @@ void setValues()
 void printMenu()
 {
   std::cout << "Ingrese la opcion deseada a continuacion(1,2,3,...): " << endl;
-  std::cout << " 1 - Informacion cache de correspondencia directa" << endl;
-  std::cout << " 2 - Informacion asociativa por conjuntos" << endl;
-  std::cout << " 3 - NADA" << endl;
-  std::cout << " 4 - cambiar valores" << endl;
-  std::cout << " 5 - acerca del programa" << endl;
+  std::cout << " 1 - Releer archivo de direcciones" << endl;
+  std::cout << " 2 - Escribir reporte" << endl;
+  std::cout << " 3 - cambiar valores de la cache" << endl;
+  std::cout << " 4 - acerca del programa" << endl;
   std::cout << " 0 - salir" << endl;
   std::cout << "seleccion: > ";
-}
-
-/**
- * Funcion para imprimir las prestaciones de la cache
- * @param option Opcion de cache a imprimir
- * @note 1 - Cache de correspondencia directa
- * @note 2 - Cache de asociativa por conjuntos de N vias
- */
-void printFeatures(short option)
-{
-
-  globalSetAssociativeCache->printFeatures();
 }
 
 void finalizarPrograma()
 {
 
-  std::cout << "\nFin del programa";
+  std::cout << "\nFin del programa" << endl;
 
   delete globalSetAssociativeCache;
 
@@ -195,21 +186,21 @@ void finalizarPrograma()
 void imprimirInformacion()
 {
 
-  std::cout << "Programa para emular el funcionamiento de una memoria cache para correspondencia directa y asociativa por conjuntos" << endl;
+  std::cout << "* Programa para emular el funcionamiento de una memoria cache simple" << endl;
 
-  std::cout << "Autores: " << endl;
+  std::cout << "\nAutores: " << endl;
 
-  std::cout << "Luis Sandoval - 26.781.082" << endl;
+  std::cout << "  * Luis Sandoval - 26.781.082" << endl;
 
-  std::cout << "Gerardo Diaz - TODO" << endl;
-
-  std::cout << "Profesor: Jose Canache" << endl;
+  std::cout << "  * Gerardo Diaz -  30.388.971" << endl;
 
   std::cout << "Universidad de Carabobo" << endl;
 
   std::cout << "Facultad Experimental de Ciencias y Tecnologia" << endl;
 
   std::cout << "Arquitectura del computador" << endl;
+
+  std::cout << "Profesor: Jose Canache" << endl;
 }
 
 /**
@@ -229,8 +220,7 @@ void readBlocksFromFile()
   {
     throw runtime_error("¡No se pudo abrir el archivo!");
   }
-  cout << "Leyendo archivo..." << endl;
-  cout << "------------------" << endl;
+
   while (!myFile.eof())
   {
 
@@ -250,18 +240,28 @@ void readBlocksFromFile()
               << "-----------------" << endl;
   }
 
-  long miss_rate = globalSetAssociativeCache->getMissCounter();
+  long miss_rate = std::round(globalSetAssociativeCache->getMissRate());
 
-  long hit_rate = globalSetAssociativeCache->getHitRate();
+  long hit_rate = std::round(globalSetAssociativeCache->getHitRate());
+
+  long accessCounter = globalSetAssociativeCache->getAccessCounter();
 
   cout << endl
        << "*******************" << endl;
 
-  std::cout << " - Miss rate: " << miss_rate << "%" << endl;
+  std::cout << "Operaciones en total: " << accessCounter << endl;
 
-  std::cout << " - Hit rate: " << hit_rate << "%" << endl;
+  std::cout << " - Tasa de Aciertos: " << hit_rate << "%" << endl;
+
+  std::cout << " - Tasa de Fallos: " << miss_rate << "%" << endl;
 
   cout << "*******************" << endl;
 
   myFile.close();
+}
+
+void writeFeatures()
+{
+
+  globalSetAssociativeCache->printFeatures();
 }
