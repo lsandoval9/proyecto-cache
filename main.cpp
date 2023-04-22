@@ -2,9 +2,9 @@
 /**
  * @brief Programa para emular el funcionamiento de una memoria cache para correspondencia directa y asociativa por conjuntos
  * @author Luis Sandoval - 26.781.082
- * @author Gerardo Diaz - TODO
- * Facultad experimental de ciencias y tecnologia - Universidad de Carabobo
- * Arquitectura del computador - Prof. Jose Canache
+ * @author Gerardo Diaz - 30.388.971
+ * Facultad Experimental de Ciencias y Tecnologia - Universidad de Carabobo
+ * Arquitectura del Computador - Prof. Jose Canache
  */
 
 // constantes
@@ -111,7 +111,7 @@ void setValues()
 
   long n_ways; // Numero de vias
 
-  std::cout << "ingrese el tamaño de la memoria cache en KB (potencia de 2)" << endl;
+  std::cout << "Ingrese el tamaño de la memoria cache en KB (potencia de 2)" << endl;
   std::cout << "> ";
 
   cin >> s_cache;
@@ -121,7 +121,7 @@ void setValues()
    */
   s_block = WORDS_PER_BLOCK;
 
-  std::cout << "ingrese el numero de vias (potencia de 2)" << endl;
+  std::cout << "Ingrese el numero de vias (potencia de 2)" << endl;
   std::cout << "NOTA: 0 es un atajo para completamente asociativa" << endl;
   std::cout << "> ";
 
@@ -165,9 +165,9 @@ void printMenu()
   std::cout << "Ingrese la opcion deseada a continuacion(1,2,3,...): " << endl;
   std::cout << " 1 - Releer archivo de direcciones" << endl;
   std::cout << " 2 - Escribir reporte (resultados.out)" << endl;
-  std::cout << " 3 - cambiar valores de la cache" << endl;
-  std::cout << " 4 - acerca del programa" << endl;
-  std::cout << " 0 - salir" << endl;
+  std::cout << " 3 - Cambiar valores de la cache" << endl;
+  std::cout << " 4 - Acerca del programa" << endl;
+  std::cout << " 0 - Salir" << endl;
   std::cout << "seleccion: > ";
 }
 
