@@ -19,12 +19,28 @@ using namespace std;
 
 #define CACHE_LINE_H
 
-
+/**
+ * Clase que representa una linea de la cache
+*/
 class CacheLine {
   private:
+  /**
+   * Tag de la linea
+  */
     long tag;
+    /**
+     * Indica si la linea es valida
+    */
     bool valid = false;
+
+    /**
+     * Valor del bloque
+    */
     long block;
+    /**
+     * Tiempo de acceso
+     * -1 si no ha sido accedido
+    */
     size_t accessTime;
   public:
 
@@ -43,9 +59,7 @@ class CacheLine {
       this->block = block;
     }
 
-    void insertFromMemory() {
-
-    }
+    // getters y setters
 
     long getTag() {
       return this->tag;

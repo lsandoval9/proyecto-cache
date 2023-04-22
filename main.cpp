@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
   return 0;
 }
 
-// FUNCIONES EXTERNAS
+// FUNCIONES
 
 /**
  * Funcion para obtener los valores de tamaño de bloque y tamaño de cache
@@ -164,13 +164,16 @@ void printMenu()
 {
   std::cout << "Ingrese la opcion deseada a continuacion(1,2,3,...): " << endl;
   std::cout << " 1 - Releer archivo de direcciones" << endl;
-  std::cout << " 2 - Escribir reporte" << endl;
+  std::cout << " 2 - Escribir reporte (resultados.out)" << endl;
   std::cout << " 3 - cambiar valores de la cache" << endl;
   std::cout << " 4 - acerca del programa" << endl;
   std::cout << " 0 - salir" << endl;
   std::cout << "seleccion: > ";
 }
 
+/**
+ * Finaliza la ejecucion del programa y libera la memoria
+*/
 void finalizarPrograma()
 {
 
@@ -181,6 +184,9 @@ void finalizarPrograma()
   exit(0);
 }
 
+/**
+ * Imprime la informacion del programa y de los integrantes del equipo
+*/
 void imprimirInformacion()
 {
 
@@ -202,8 +208,7 @@ void imprimirInformacion()
 }
 
 /**
- * Funcion para guardar un bloque de la memoria principal en la cache
- * @param input Direccion del bloque a guardar
+ * Funcion para escribir las prestaciones de la cache y las entradas en un archivo
  */
 void readBlocksFromFile()
 {
@@ -213,6 +218,8 @@ void readBlocksFromFile()
   ifstream myFile;
 
   myFile.open("entradas.in", ios::in);
+
+  globalSetAssociativeCache->clearCache();
 
   if (!myFile.is_open())
   {
@@ -258,6 +265,9 @@ void readBlocksFromFile()
   myFile.close();
 }
 
+/**
+ * Funcion para imprimir las prestaciones de la cache
+*/
 void writeFeatures()
 {
 
