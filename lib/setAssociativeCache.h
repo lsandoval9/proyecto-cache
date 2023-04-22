@@ -90,7 +90,7 @@ public:
 
     bool isHit = false;
 
-    size_t lessRecent = 0;
+    size_t leastRecent = 0;
 
     long currentBlock = n_ways * set;
 
@@ -135,27 +135,27 @@ public:
         break;
       }
 
-      if (this->cache[i].getAccessTime() < this->cache[lessRecent].getAccessTime())
+      if (this->cache[i].getAccessTime() < this->cache[leastRecent].getAccessTime())
       {
 
-        lessRecent = i;
+        leastRecent = i;
       }
     }
 
     if (!inserted)
     {
 
-      this->cache[lessRecent].setTag(tag);
+      this->cache[leastRecent].setTag(tag);
 
-      this->cache[lessRecent].setBlock(address);
+      this->cache[leastRecent].setBlock(address);
 
-      this->cache[lessRecent].setValid(true);
+      this->cache[leastRecent].setValid(true);
 
-      this->cache[lessRecent].setAccessTime(this->access_time);
+      this->cache[leastRecent].setAccessTime(this->access_time);
 
       this->access_time++;
 
-      cout << "Less recent" << endl;
+      cout << "Least Recently Used" << endl;
 
       this->miss_counter++;
     }
