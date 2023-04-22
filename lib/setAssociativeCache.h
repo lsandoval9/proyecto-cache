@@ -20,10 +20,19 @@ class SetAssociativeCache : public BaseCache
 {
 
 private:
+/**
+ * Número de vías de la caché
+*/
   long n_ways;
 
+  /**
+   * Vector con las líneas de la caché
+  */
   vector<CacheLine> cache;
 
+  /**
+   * Número de conjuntos de la caché
+  */
   long sets_in_cache;
 
 public:
@@ -158,6 +167,11 @@ public:
     return isHit;
   }
 
+  /**
+   * Funcion para inicializar la caché
+   * Inserta líneas vacías en el vector de líneas de la cache con
+   * valid = false y access_time = -1 (-1 indica que no ha sido accedida)
+  */
   void initializeCache()
   {
     this->cache = vector<CacheLine>(this->blocks_in_cache);
@@ -169,6 +183,10 @@ public:
     }
   }
 
+  /**
+   * Función para obtener las características de la caché
+   * @returns string con las características de la caché
+  */
   string getFeatures()
   {
 
@@ -195,6 +213,9 @@ public:
     return features;
   }
 
+  /**
+   * Funcion para imprimir las características de la caché
+  */
   void printFeatures()
   {
     std::ofstream fileCleaner("resultados.out", std::ios::out | std::ios::trunc);
@@ -272,32 +293,24 @@ public:
     myFile.close();
   }
 
-  void printCacheLines(ofstream *file)
-  {
 
-    for (int i = 0; i < this->sets_in_cache; i++)
+
+  void clearCache()
+  {
+    this->access_time = 0;
+    this->miss_counter = 0;
+
+    for (int i = 0; i < this->blocks_in_cache; i++)
     {
 
-      long j = i * this->n_ways;
-
-      cout << "Conjunto " << i << endl;
-
-      for (j; j < (i + 1) * this->n_ways; j++)
-      {
-
-        cout << "Bloque " << j << endl;
-
-        cout << "Tag: " << this->cache[j].getTag() << endl;
-
-        cout << "Valido: " << this->cache[j].getValid() << endl;
-
-        cout << "Tiempo de acceso: " << this->cache[j].getAccessTime() << endl;
-
-        cout << "Bloque: " << this->cache[j].getBlock() << endl;
-      }
+      this->cache[i] = CacheLine(false);
     }
   }
 
+  /**
+   * Destructor de la clase
+   * Libera la memoria del vector de líneas de la caché
+   */
   ~SetAssociativeCache()
   {
 

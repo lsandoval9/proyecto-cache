@@ -15,6 +15,10 @@ using namespace std;
 
 #define BASENPARSER_H
 
+/**
+ * @brief clase para parsear numeros hexadecimales a binarios y viceversa
+ * tambien permite imprimir numeros con una base especifica
+*/
 class BaseNParser
 {
 
@@ -59,12 +63,17 @@ public:
   }
 
 
+  /**
+   * @brief convierte un numero decimal (long) a binario y lo imprime
+   * con una cantidad de bits especifica
+  */
   static string getBinaryString(long number, long bits) {
 
     std::bitset<32> binary(number);             // convierte el número a binario con 32 bits
     std::string binaryStr = binary.to_string(); // convierte el número binario a una cadena de caracteres
 
     // si la cantidad de bits es menor a 32, se recorta la cadena para que tenga la cantidad de bits especificada
+    // 32 es el tamaño maximo de la direccion en bits
     if (bits < 32)
     {
       binaryStr = binaryStr.substr(32 - bits);
@@ -73,7 +82,10 @@ public:
     return binaryStr;
   }
 
-
+  /**
+   * @brief convierte un numero decimal (long) a binario y transforma cada bit en un caracter
+   * @returns string con los caracteres 0 y 1
+  */
   static string toFixedString(double number, int precision ) {
 
     std::ostringstream out;
