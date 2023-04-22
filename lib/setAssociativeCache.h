@@ -90,11 +90,11 @@ public:
 
     bool isHit = false;
 
-    size_t leastRecent = 0;
-
     long currentBlock = n_ways * set;
 
     long i;
+
+    long leastRecent = currentBlock;
 
     for (i = currentBlock; i < this->n_ways + currentBlock; ++i)
     {
@@ -154,8 +154,6 @@ public:
       this->cache[leastRecent].setAccessTime(this->access_time);
 
       this->access_time++;
-
-      cout << "Least Recently Used" << endl;
 
       this->miss_counter++;
     }

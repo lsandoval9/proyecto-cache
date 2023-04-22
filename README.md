@@ -1,17 +1,25 @@
 # Simulador de memoria cache simple
 
-### Arquitectura del computador
+## Arquitectura del computador
 
-### Prof. José Canache
+### **Prof. José Canache**
 
 ### Autores:
 
-- Luis A. Sandoval - V26.781.082
-- Gerardo Diaz - V30.388.971
+- **Luis A. Sandoval - V26.781.082**
+- **Gerardo Diaz - V30.388.971**
 
 ## Introducción
 
 El programa esta diseñado para emular el funcionamiento de una memoria cache sencilla. Permite cambiar valores de forma dinamica y generar reportes.
+
+## Aclaraciones
+
+- por defecto las palabras son siempre de 32 bits (4 bytes)
+- las direcciones son de 32 bits
+- los bloques son de 4 palabras
+- el archivo de entrada debe llamarse **"entradas.in"** y contener direcciones en hexadecimal de 32 bits, es decir, 8 digitos en hexadecimal en el formato **0xXXXXXXXX**, por ejemplo: **0x00000000**
+- el archivo de salida se llamara **"resultados.out"**
 
 ## Ejecucion
 
@@ -31,6 +39,10 @@ Tambien es posible ejecutar el programa manualmente, de la siguiente manera:
   make && ./RUN.out
 ```
 
+```bash
+  g++ main.cpp -o RUN.out && ./RUN.out
+```
+
 ## Funcionamiento
 
 El programa le dara la bienvenida al usuario y le pedira que ingrese los parametros de la memoria cache, correspondientes al tamaño de la memoria cache en KB y el numero de vias. **Ambos parametros deben ser potencias de 2.**
@@ -39,11 +51,11 @@ Una vez ingresados el programa leera el archivo "entradas.in" e iniciara la simu
 
 Luego de inicializado se mostrara un menu con las opciones disponibles para el usuario, las cuales son:
 
-- 1 - Releer archivo de direcciones
-- 2 - Escribir reporte
-- 3 - Cambiar valores de la cache
-- 4 - Acerca del programa
-- 0 - Salir
+- **1** - Releer archivo de direcciones
+- **2** - Escribir reporte
+- **3** - Cambiar valores de la cache
+- **4** - Acerca del programa
+- **0** - Salir
 
 La primera opcion leera el archivo de direcciones, por lo cual es posible agregar direcciones aun si el programa esta en funcionamiento.
 
