@@ -239,6 +239,11 @@ void readBlocksFromFile()
 
     long number = BaseNParser::parseHexStringToNumber(input);
 
+    if (number > pow(2, 32) || number < 0)
+    {
+      throw runtime_error("¡El numero ingresado no es valido!");
+    }
+
     globalSetAssociativeCache->saveBlockInCache(number);
 
     std::cout << endl
