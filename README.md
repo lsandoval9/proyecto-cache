@@ -42,6 +42,8 @@ Tambien es posible ejecutar el programa manualmente, de la siguiente manera:
   make && ./RUN.out
 ```
 
+o si no se tiene instalado make:
+
 ```bash
   g++ main.cpp -o RUN.out && ./RUN.out
 ```
