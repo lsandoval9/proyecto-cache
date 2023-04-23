@@ -134,6 +134,12 @@ void setValues()
     n_ways = blockInCache;
   }
 
+  // chequear que el tamaño de la cache en kilobytes no supere los 32 bits
+  if (s_cache > (pow(2, 32) - 1))
+  {
+    throw std::runtime_error("¡El tamaño de la cache supera el limite de direccionamiento (32 bits)!");
+  }
+
   if ((s_block & (s_block - 1)) != 0)
   {
     throw std::runtime_error("¡El tamaño de la memoria cache debe ser potencia de 2!");
@@ -144,6 +150,11 @@ void setValues()
     throw std::runtime_error("¡El tamaño de la memoria cache y el tamaño del bloque deben ser mayores a 0!");
   }
 
+  if ((s_cache & (s_cache - 1)) != 0)
+  {
+    throw std::runtime_error("¡El tamaño de la memoria cache debe ser potencia de 2!");
+  }
+
   if ((n_ways & (n_ways - 1)) != 0)
   {
     throw std::runtime_error("¡El numero de vias debe ser multiplo de 2!");
@@ -151,7 +162,7 @@ void setValues()
 
   if (n_ways > blockInCache)
   {
-    throw std::runtime_error("¡El numero de vias no puede ser mayor al tamaño de la cache!");
+    throw std::runtime_error("¡El numero de vias no puede ser mayor al tamaño de la cache (en bloques)!");
   }
 
   globalSetAssociativeCache = new SetAssociativeCache(s_block, s_cache, n_ways);
