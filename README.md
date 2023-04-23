@@ -55,7 +55,7 @@ Una vez ingresados el programa leera el archivo "entradas.in" e iniciara la simu
 Luego de inicializado se mostrara un menu con las opciones disponibles para el usuario, las cuales son:
 
 - **1** - Releer archivo de direcciones
-- **2** - Escribir reporte
+- **2** - Escribir reporte ('**resultados.out**')
 - **3** - Cambiar valores de la cache
 - **4** - Acerca del programa
 - **0** - Salir
