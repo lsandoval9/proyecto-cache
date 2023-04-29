@@ -54,7 +54,8 @@ int main(int argc, char const *argv[])
 
   int input = -1;
 
-  std::cout << "¡Bienvenido al programa de emulacion de una memoria cache!" << endl << endl;
+  std::cout << "¡Bienvenido al programa de emulacion de una memoria cache!" << endl
+            << endl;
 
   setValues();
   readBlocksFromFile();
@@ -89,7 +90,6 @@ int main(int argc, char const *argv[])
     default:
       std::cout << "¡Opcion invalida!";
     }
-
   }
 
   return 0;
@@ -184,7 +184,7 @@ void printMenu()
 
 /**
  * Finaliza la ejecucion del programa y libera la memoria
-*/
+ */
 void finalizarPrograma()
 {
 
@@ -197,7 +197,7 @@ void finalizarPrograma()
 
 /**
  * Imprime la informacion del programa y de los integrantes del equipo
-*/
+ */
 void imprimirInformacion()
 {
 
@@ -242,23 +242,33 @@ void readBlocksFromFile()
 
     string input;
 
-    // Convert hex to binary
-
     getline(myFile, input);
 
-    std::cout << "Memory block: " << input << endl;
-
-    long number = BaseNParser::parseHexStringToNumber(input);
-
-    if (number > pow(2, 32) || number < 0)
+    try
     {
-      throw runtime_error("¡El numero ingresado no es valido!");
+      long number = BaseNParser::parseHexStringToNumber(input);
+
+      if (number > pow(2, 32) || number < 0)
+      {
+        throw runtime_error("¡El numero ingresado no es valido!");
+      }
+
+      std::cout << "\033[1m" << "Memory block:" << "\033[0m" << " " << input << std::endl;
+
+      globalSetAssociativeCache->saveBlockInCache(number);
+
+      std::cout << endl
+                << "-----------------" << endl;
     }
-
-    globalSetAssociativeCache->saveBlockInCache(number);
-
-    std::cout << endl
-              << "-----------------" << endl;
+    catch (const std::exception &e)
+    {
+      if (input != "" && input != "\n") {
+        std::cout << "Error: No se ingreso un numero hexadecimal valido" << endl;
+        std::cout << "Numero ingresado: '" << input << "'" << endl;
+        std::cout << "\033[1m" << "La línea fue ignorada" << "\033[0m" << std::endl << std::endl;
+        std::cout << "-----------------" << endl;
+      }
+    }
   }
 
   long miss_rate = std::round(globalSetAssociativeCache->getMissRate());
@@ -283,7 +293,7 @@ void readBlocksFromFile()
 
 /**
  * Funcion para imprimir las prestaciones de la cache
-*/
+ */
 void writeFeatures()
 {
 
