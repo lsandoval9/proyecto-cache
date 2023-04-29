@@ -60,13 +60,23 @@ protected:
    */
   long bitsInTag;
 
+  /**
+   * Política de reemplazo
+   * 0: LRU (default)
+   * 1: FIFO
+   * 2: random
+   * 
+  */
+  short replacePolicy;
+
 public:
-  BaseCache(long s_block, long s_cache)
+  BaseCache(long s_block, long s_cache, short replacePolicy = 0)
   {
     this->s_block = s_block;
     this->s_cache = s_cache;
     this->access_time = 0;
     this->miss_counter = 0;
+    this->replacePolicy = replacePolicy;
 
     this->calculateBlocksInCache();
   }
@@ -182,9 +192,19 @@ public:
     this->s_cache = s_cache;
   }
 
-  void getAccessCounter(size_t access_time)
+  void setAccessCounter(size_t access_time)
   {
     this->access_time = access_time;
+  }
+
+  void getReplacePolicy(short replacePolicy)
+  {
+    this->replacePolicy = replacePolicy;
+  }
+
+  void setReplacePolicy(short replacePolicy)
+  {
+    this->replacePolicy = replacePolicy;
   }
 
   void setBlocksInCache(long blocks_in_cache)
