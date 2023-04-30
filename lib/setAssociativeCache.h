@@ -123,10 +123,10 @@ public:
     case 0:
       isHit = this->insertBlockLRU(currentBlock, tag, address);
       break;
-    case 2:
+    case 1:
       isHit = this->insertBlockLFU(currentBlock, tag, address);
       break;
-    case 3:
+    case 2:
       isHit = this->insertBlockRandom(currentBlock, tag, address);
       break;
     }
@@ -159,12 +159,17 @@ public:
 
       bool valid = this->cache[i].getValid();
 
+      cout << "tag: " << this->cache[i].getTag() << endl;
+      cout << "address: " << address << endl;
+
       if (valid && this->cache[i].getTag() == tag)
       {
 
+        this->cache[i].setAccessCounter(this->cache[i].getAccessCounter() + 1);
+
         this->cache[i].setAccessTime(this->access_time);
 
-        this->access_counter++;
+        this->access_time++;
 
         inserted = true;
 
@@ -184,7 +189,13 @@ public:
 
         this->cache[i].setAccessTime(this->access_time);
 
+        this->cache[i].setAccessCounter(1);
+
+        this->access_time++;
+
         this->miss_counter++;
+
+        this->cache[i].setAccessCounter(1);
 
         inserted = true;
 
@@ -207,11 +218,16 @@ public:
 
       this->cache[leastUsed].setValid(true);
 
+      this->cache[leastUsed].setAccessCounter(1);
+
       this->cache[leastUsed].setAccessTime(this->access_time);
 
       this->access_time++;
 
       this->miss_counter++;
+
+      cout << "Replaced block: " << leastUsed << endl;
+      cout << "Tag: " << this->cache[leastUsed].getAccessCounter() << endl;
     }
 
     return isHit;
@@ -313,6 +329,8 @@ public:
 
     bool isHit = false;
 
+    long randomBlock;
+
     std::random_device rd; // obtain a random number from hardware
 
     std::mt19937 gen(rd()); // seed the generator
@@ -321,7 +339,9 @@ public:
 
     std::uniform_int_distribution<> distr(currentBlock, randomTopExclusive); // define the range
 
-    long randomBlock = distr(gen);
+    randomBlock = distr(gen);
+
+    cout << "Random block: " << randomBlock << endl;
 
     for (long i = currentBlock; i < this->n_ways + currentBlock; ++i)
     {

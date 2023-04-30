@@ -111,6 +111,8 @@ void setValues()
 
   long n_ways; // Numero de vias
 
+  short replacementPolicy; // Politica de reemplazo
+
   std::cout << "Ingrese el tamaño de la memoria cache en KB (potencia de 2)" << endl;
   std::cout << "> ";
 
@@ -124,10 +126,18 @@ void setValues()
   std::cout << "Ingrese el numero de vias (potencia de 2)" << endl;
   std::cout << "NOTA: 0 es un atajo para completamente asociativa" << endl;
   std::cout << "> ";
-
   cin >> n_ways;
 
+  std::cout << "Ingrese la politica de reemplazo (0: LRU, 1: LFU, 2: RANDOM)" << endl;
+  std::cout << "> ";
+  std::cin >> replacementPolicy;
+
   long blockInCache = s_cache * 1024 / (s_block * 4);
+
+  if (replacementPolicy < 0 || replacementPolicy > 2)
+  {
+    throw std::runtime_error("¡La politica de reemplazo debe ser 0, 1 o 2!");
+  }
 
   if (n_ways == 0)
   {
@@ -165,7 +175,7 @@ void setValues()
     throw std::runtime_error("¡El numero de vias no puede ser mayor al tamaño de la cache (en bloques)!");
   }
 
-  globalSetAssociativeCache = new SetAssociativeCache(s_block, s_cache, n_ways);
+  globalSetAssociativeCache = new SetAssociativeCache(s_block, s_cache, n_ways, replacementPolicy);
 }
 
 /**
@@ -218,10 +228,69 @@ void imprimirInformacion()
   std::cout << "Profesor: Jose Canache" << endl;
 }
 
+void readBlocksFromFile()
+{
+
+  std::ifstream myFile("entradas.in");
+  std::string line;
+  int lineNumber = 0;
+
+  while (std::getline(myFile, line))
+  {
+    lineNumber++;
+    std::istringstream iss(line);
+    long address;
+    char c;
+    if (!(iss >> std::hex >> address) || (iss.get(c) && c != '\n'))
+    {
+      std::cerr << "Error en la línea " << lineNumber << ": " << line << std::endl;
+      std::cerr << "Dirección en hexadecimal invalida: " << std::hex << address << std::endl;
+    }
+    else
+    {
+      std::cout << "Dirección en hexadecimal: " << std::hex << address << std::endl;
+
+      if (address > pow(2, 32) || address < 0)
+      {
+        throw runtime_error("¡El numero ingresado no es valido!");
+      }
+
+      std::cout << "\033[1m"
+                << "Memory block:"
+                << "\033[0m"
+                << " " << std::hex << address << std::endl;
+
+      globalSetAssociativeCache->saveBlockInCache(address);
+
+      std::cout << endl
+                << "-----------------" << endl;
+    }
+  }
+
+  double miss_rate = std::round(globalSetAssociativeCache->getMissRate() * 100) / 100;
+
+  double hit_rate = std::round(globalSetAssociativeCache->getHitRate() * 100) / 100;
+
+  long accessCounter = globalSetAssociativeCache->getAccessTime();
+
+  cout << endl
+       << "*******************" << endl;
+
+  std::cout << "Operaciones en total: " << accessCounter << endl;
+
+  std::cout << " - Tasa de Aciertos: " << hit_rate << "%" << endl;
+
+  std::cout << " - Tasa de Fallos: " << miss_rate << "%" << endl;
+
+  cout << "*******************" << endl;
+
+  myFile.close();
+}
+
 /**
  * Funcion para escribir las prestaciones de la cache y las entradas en un archivo
  */
-void readBlocksFromFile()
+void readBlocksFromFile2()
 {
 
   // Read hex numbers from a file where each number is separated by an endline
@@ -278,9 +347,9 @@ void readBlocksFromFile()
     }
   }
 
-  long miss_rate = std::round(globalSetAssociativeCache->getMissRate());
+  double miss_rate = std::round(globalSetAssociativeCache->getMissRate() * 100) / 100;
 
-  long hit_rate = std::round(globalSetAssociativeCache->getHitRate());
+  double hit_rate = std::round(globalSetAssociativeCache->getHitRate() * 100) / 100;
 
   long accessCounter = globalSetAssociativeCache->getAccessTime();
 

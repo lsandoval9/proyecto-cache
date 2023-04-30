@@ -7,7 +7,7 @@ LIBS = -lm
 # Compilador utilizado, por ejemplo icc, pgcc , gcc
 CC = g++
 # Banderas del compilador, por ejemplo -DDEBUG -02 -03 -wall -g
-CFLAGS = -gcc
+CFLAGS = -gcc -std=c++11
 
 # Palabras que usa el Makefile que podrian ser el nombre de un Programa
 .PHONY: default all clean

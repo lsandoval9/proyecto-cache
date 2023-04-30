@@ -54,6 +54,7 @@ public:
     this->accessTime = -1;
     this->block = 0;
     this->tag = 0;
+    this->accessCounter = 0;
   }
 
   CacheLine(bool valid)

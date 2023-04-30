@@ -1,7 +1,6 @@
 
 #include "../constants/constants.h"
 
-#include <iostream>
 #include <string>
 #include <iomanip>
 #include <unistd.h>
@@ -9,6 +8,9 @@
 #include <bitset>
 #include <fstream>
 #include <sstream>
+#include <iostream>
+#include <string>
+#include <regex>
 
 using namespace std;
 
@@ -93,6 +95,26 @@ public:
     std::ostringstream out;
     out << std::fixed << std::setprecision(precision) << number;
     return out.str();
+  }
+
+  static bool isValidHexAddress(const std::string &address)
+  {
+    // Check that the string has exactly 10 characters
+    if (address.length() != 10)
+    {
+      return false;
+    }
+
+    // Check that the first two characters are "0x"
+    if (address.substr(0, 2) != "0x")
+    {
+      return false;
+    }
+
+    // Check that the remaining characters are valid hexadecimal digits
+    cout << address << endl;
+    static const std::regex pattern("[[:xdigit:]]{8}");
+    return std::regex_match(address.substr(2), pattern);
   }
 };
 
