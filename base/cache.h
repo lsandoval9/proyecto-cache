@@ -36,9 +36,14 @@ protected:
   long sets_in_cache;
 
   /**
-   * Contador de accesos a la caché
+   * Contador que simula el tiempo de acceso a la caché
    */
   size_t access_time;
+
+  /**
+   * Contador de accesos a la caché
+   */
+  size_t access_counter;
 
   /**
    * Contador de accesos fallidos a la caché
@@ -65,8 +70,8 @@ protected:
    * 0: LRU (default)
    * 1: FIFO
    * 2: random
-   * 
-  */
+   *
+   */
   short replacePolicy;
 
 public:
@@ -83,13 +88,13 @@ public:
 
   // metodos virtuales puros
 
-  virtual bool saveBlockInCache(long blockAddress) = 0;
+  virtual void saveBlockInCache(long blockAddress) = 0;
 
   // metodos comunes
 
   /**
    * @brief Calcula la cantidad de bloques que caben en la caché
-  */
+   */
   void calculateBlocksInCache()
   {
     long cacheInBytes = this->s_cache * 1024;
@@ -100,7 +105,7 @@ public:
   /**
    * @brief Calcula el tamaño real de la caché en kilobytes
    * @param bitsInTag Tamaño de la etiqueta en bits
-  */
+   */
   double getRealSize(long bitsInTag)
   {
 
@@ -111,7 +116,7 @@ public:
 
   /**
    * @brief Calcula el porcentaje de accesos fallidos a la caché
-  */
+   */
   double getMissRate()
   {
 
@@ -125,7 +130,7 @@ public:
 
   /**
    * @brief Calcula el porcentaje de accesos exitosos a la caché
-  */
+   */
   double getHitRate()
   {
 
@@ -147,7 +152,7 @@ public:
     return this->s_cache;
   }
 
-  long getAccessCounter()
+  long getAccessTime()
   {
     return this->access_time;
   }
@@ -190,11 +195,6 @@ public:
   void setSCache(long s_cache)
   {
     this->s_cache = s_cache;
-  }
-
-  void setAccessCounter(size_t access_time)
-  {
-    this->access_time = access_time;
   }
 
   void getReplacePolicy(short replacePolicy)

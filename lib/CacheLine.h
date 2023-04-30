@@ -1,6 +1,5 @@
 
 
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,7 +11,6 @@
 
 // librerias propias
 
-
 using namespace std;
 
 #ifndef CACHE_LINE_H
@@ -21,82 +19,113 @@ using namespace std;
 
 /**
  * Clase que representa una linea de la cache
-*/
-class CacheLine {
-  private:
+ */
+class CacheLine
+{
+private:
   /**
    * Tag de la linea
-  */
-    long tag;
-    /**
-     * Indica si la linea es valida
-    */
-    bool valid = false;
+   */
+  long tag;
+  /**
+   * Indica si la linea es valida
+   */
+  bool valid = false;
 
-    /**
-     * Valor del bloque
-    */
-    long block;
-    /**
-     * Tiempo de acceso
-     * -1 si no ha sido accedido
-    */
-    size_t accessTime;
-  public:
+  /**
+   * Valor del bloque
+   */
+  long block;
+  /**
+   * Tiempo de acceso
+   * -1 si no ha sido accedido
+   */
+  size_t accessTime;
 
-    CacheLine(){
-      this->valid = false;
-    }
+  /**
+   * Contador con el numero de accesos a la linea
+   */
+  size_t accessCounter;
 
-    CacheLine(bool valid) {
-      this->valid = valid;
-      this->accessTime = -1;
-    }
+public:
+  CacheLine()
+  {
+    this->valid = false;
+    this->accessTime = -1;
+    this->block = 0;
+    this->tag = 0;
+  }
 
-    CacheLine(long tag, bool valid, long offset, long set) {
-      this->tag = tag;
-      this->valid = valid;
-      this->block = block;
-    }
+  CacheLine(bool valid)
+  {
+    this->valid = valid;
+    this->accessTime = -1;
+    this->block = 0;
+    this->tag = 0;
+  }
 
-    // getters y setters
+  CacheLine(long tag, bool valid, long offset, long set)
+  {
+    this->tag = tag;
+    this->valid = valid;
+    this->block = block;
+  }
 
-    long getTag() {
-      return this->tag;
-    }
+  // getters y setters
 
-    bool getValid() {
-      return this->valid;
-    }
+  long getTag()
+  {
+    return this->tag;
+  }
 
-    long getBlock() {
-      return this->block;
-    }
+  bool getValid()
+  {
+    return this->valid;
+  }
 
-    long getAccessTime() {
-      return this->accessTime;
-    }
+  long getBlock()
+  {
+    return this->block;
+  }
 
+  long getAccessTime()
+  {
+    return this->accessTime;
+  }
 
-    void setTag(long tag) {
-      this->tag = tag;
-    }
+  long getAccessCounter()
+  {
+    return this->accessCounter;
+  }
 
-    void setValid(bool valid) {
-      this->valid = valid;
-    }
+  void setTag(long tag)
+  {
+    this->tag = tag;
+  }
 
-    void setBlock(long block) {
-      this->block = block;
-    }
+  void setValid(bool valid)
+  {
+    this->valid = valid;
+  }
 
-    void setAccessTime(size_t accessTime) {
-      this->accessTime = accessTime;
-    }
+  void setBlock(long block)
+  {
+    this->block = block;
+  }
 
-    ~CacheLine() {
+  void setAccessTime(size_t accessTime)
+  {
+    this->accessTime = accessTime;
+  }
 
-    }
+  void setAccessCounter(size_t accessCounter)
+  {
+    this->accessCounter = accessCounter;
+  }
+
+  ~CacheLine()
+  {
+  }
 };
 
 #endif

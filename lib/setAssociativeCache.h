@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <random>
 
 // librerias propias
 
@@ -20,19 +21,19 @@ class SetAssociativeCache : public BaseCache
 {
 
 private:
-/**
- * Número de vías de la caché
-*/
+  /**
+   * Número de vías de la caché
+   */
   long n_ways;
 
   /**
    * Vector con las líneas de la caché
-  */
+   */
   vector<CacheLine> cache;
 
   /**
    * Número de conjuntos de la caché
-  */
+   */
   long sets_in_cache;
 
 public:
@@ -54,11 +55,30 @@ public:
     this->initializeCache();
   }
 
+  SetAssociativeCache(long s_block, long s_cache, long n_ways, short replacePolicy) : BaseCache(s_block, s_cache, replacePolicy)
+  {
+
+    this->n_ways = n_ways;
+
+    this->bitsInOffset = log2(this->s_block * WORD_SIZE);
+
+    this->sets_in_cache = this->blocks_in_cache / this->n_ways;
+
+    this->sets_in_cache = this->blocks_in_cache / this->n_ways;
+
+    this->bitsInSet = log2(this->sets_in_cache);
+
+    this->bitsInTag = ADDRESS_SIZE - bitsInSet - bitsInOffset;
+
+    this->initializeCache();
+  }
+
   /**
    * Guarda un bloque en la caché
    * @param binaryAddress dirección en binario de 32 bits
+   * @param replacePolicy política de reemplazo (0: LRU, 1: FIFO, 2: LFU, 3: Random)
    */
-  bool saveBlockInCache(long binaryAddress)
+  void saveBlockInCache(long binaryAddress)
   {
 
     CacheRequest *request = new CacheRequest(binaryAddress, this->bitsInOffset, this->bitsInSet);
@@ -73,30 +93,147 @@ public:
 
     address = request->getBinaryAddress();
 
-    std::cout << "Address: ";
+    std::cout << "\033[1m"
+              << "Address: "
+              << "\033[0m";
     BaseNParser::printLongInBinary(address, ADDRESS_SIZE);
-    std::cout << endl;
-    std::cout << "Tag: ";
+    std::cout << std::endl;
+    std::cout << "\033[1m"
+              << "Tag: "
+              << "\033[0m";
     BaseNParser::printLongInBinary(tag, this->bitsInTag);
-    std::cout << endl;
-    std::cout << "Set: ";
+    std::cout << std::endl;
+    std::cout << "\033[1m"
+              << "Set: "
+              << "\033[0m";
     BaseNParser::printLongInBinary(set, this->bitsInSet);
-    std::cout << endl;
-    std::cout << "Offset: ";
+    std::cout << std::endl;
+    std::cout << "\033[1m"
+              << "Offset: "
+              << "\033[0m";
     BaseNParser::printLongInBinary(offset, this->bitsInOffset);
-    cout << endl;
+    std::cout << std::endl;
+
+    long currentBlock = n_ways * set;
+
+    bool isHit = false;
+
+    switch (this->replacePolicy)
+    {
+    case 0:
+      isHit = this->insertBlockLRU(currentBlock, tag, address);
+      break;
+    case 2:
+      isHit = this->insertBlockLFU(currentBlock, tag, address);
+      break;
+    case 3:
+      isHit = this->insertBlockRandom(currentBlock, tag, address);
+      break;
+    }
+
+    string hitOrMis = isHit ? "Hit" : "Miss";
+
+    std::cout << "\033[1m"
+              << "H/M: "
+              << "\033[0m" << hitOrMis << std::endl;
+  }
+
+  /**
+   * Inserta un bloque en la caché con política de reemplazo LFU
+   * LFU consiste en reemplazar el bloque que menos veces se ha usado
+   * @param currentBlock bloque actual
+   * @param tag etiqueta del bloque
+   * @param address dirección binaria
+   */
+  bool insertBlockLFU(long currentBlock, long tag, long address)
+  {
 
     bool inserted = false;
 
     bool isHit = false;
 
-    long currentBlock = n_ways * set;
+    long leastUsed = currentBlock;
 
-    long i;
+    for (long i = currentBlock; i < this->n_ways + currentBlock; ++i)
+    {
+
+      bool valid = this->cache[i].getValid();
+
+      if (valid && this->cache[i].getTag() == tag)
+      {
+
+        this->cache[i].setAccessTime(this->access_time);
+
+        this->access_counter++;
+
+        inserted = true;
+
+        isHit = true;
+
+        break;
+      }
+
+      if (!valid)
+      {
+
+        this->cache[i].setTag(tag);
+
+        this->cache[i].setBlock(address);
+
+        this->cache[i].setValid(true);
+
+        this->cache[i].setAccessTime(this->access_time);
+
+        this->miss_counter++;
+
+        inserted = true;
+
+        break;
+      }
+
+      if (this->cache[i].getAccessCounter() < this->cache[leastUsed].getAccessCounter())
+      {
+
+        leastUsed = i;
+      }
+    }
+
+    if (!inserted)
+    {
+
+      this->cache[leastUsed].setTag(tag);
+
+      this->cache[leastUsed].setBlock(address);
+
+      this->cache[leastUsed].setValid(true);
+
+      this->cache[leastUsed].setAccessTime(this->access_time);
+
+      this->access_time++;
+
+      this->miss_counter++;
+    }
+
+    return isHit;
+  }
+
+  /**
+   * Inserta un bloque en la caché con política de reemplazo LRU
+   * LRU consiste en reemplazar el bloque que menos recientemente se ha usado
+   * @param currentBlock bloque actual
+   * @param tag etiqueta del bloque
+   * @param address dirección binaria
+   */
+  bool insertBlockLRU(long currentBlock, long tag, long address)
+  {
+
+    bool inserted = false;
+
+    bool isHit = false;
 
     long leastRecent = currentBlock;
 
-    for (i = currentBlock; i < this->n_ways + currentBlock; ++i)
+    for (long i = currentBlock; i < this->n_ways + currentBlock; ++i)
     {
 
       bool valid = this->cache[i].getValid();
@@ -158,9 +295,89 @@ public:
       this->miss_counter++;
     }
 
-    string hitOrMis = isHit ? "Hit" : "Miss";
+    return isHit;
+  }
 
-    std::cout << "H/M: " << hitOrMis << endl;
+  /**
+   * Inserta un bloque en la caché con política de reemplazo Random
+   * Random consiste en reemplazar un bloque aleatorio. En este caso se obtiene un
+   * número aleatorio entre el bloque actual y el bloque actual más el número de vías para reemplazar el conjunto
+   * @param currentBlock bloque actual
+   * @param tag etiqueta del bloque
+   * @param address dirección binaria
+   */
+  bool insertBlockRandom(long currentBlock, long tag, long address)
+  {
+
+    bool inserted = false;
+
+    bool isHit = false;
+
+    std::random_device rd; // obtain a random number from hardware
+
+    std::mt19937 gen(rd()); // seed the generator
+
+    long randomTopExclusive = (currentBlock + n_ways) - 1;
+
+    std::uniform_int_distribution<> distr(currentBlock, randomTopExclusive); // define the range
+
+    long randomBlock = distr(gen);
+
+    for (long i = currentBlock; i < this->n_ways + currentBlock; ++i)
+    {
+
+      bool valid = this->cache[i].getValid();
+
+      if (valid && this->cache[i].getTag() == tag)
+      {
+
+        this->cache[i].setAccessTime(this->access_time);
+
+        this->access_time++;
+
+        inserted = true;
+
+        isHit = true;
+
+        break;
+      }
+
+      if (!valid)
+      {
+
+        this->cache[i].setTag(tag);
+
+        this->cache[i].setBlock(address);
+
+        this->cache[i].setValid(true);
+
+        this->cache[i].setAccessTime(this->access_time);
+
+        this->access_time++;
+
+        this->miss_counter++;
+
+        inserted = true;
+
+        break;
+      }
+    }
+
+    if (!inserted)
+    {
+
+      this->cache[randomBlock].setTag(tag);
+
+      this->cache[randomBlock].setBlock(address);
+
+      this->cache[randomBlock].setValid(true);
+
+      this->cache[randomBlock].setAccessTime(this->access_time);
+
+      this->access_time++;
+
+      this->miss_counter++;
+    }
 
     return isHit;
   }
@@ -169,7 +386,7 @@ public:
    * Funcion para inicializar la caché
    * Inserta líneas vacías en el vector de líneas de la cache con
    * valid = false y access_time = -1 (-1 indica que no ha sido accedida)
-  */
+   */
   void initializeCache()
   {
     this->cache = vector<CacheLine>(this->blocks_in_cache);
@@ -184,7 +401,7 @@ public:
   /**
    * Función para obtener las características de la caché
    * @returns string con las características de la caché
-  */
+   */
   string getFeatures()
   {
 
@@ -204,7 +421,7 @@ public:
 
     features += "Tamaño efectivo: " + std::to_string((this->blocks_in_cache * WORDS_PER_BLOCK * WORD_SIZE) / 1024) + "KB\n";
 
-    string roundedString = BaseNParser::toFixedString(roundedSize, 1);                  // get the rounded value as a string
+    string roundedString = BaseNParser::toFixedString(roundedSize, 1); // get the rounded value as a string
 
     features += "Tamaño real: " + roundedString + "KB\n";
 
@@ -213,7 +430,7 @@ public:
 
   /**
    * Funcion para imprimir las características de la caché
-  */
+   */
   void printFeatures()
   {
     std::ofstream fileCleaner("resultados.out", std::ios::out | std::ios::trunc);
@@ -272,15 +489,18 @@ public:
 
         output = " * Tag: " + BaseNParser::getBinaryString(this->cache[j].getTag(), this->getBitsInTag()) + '\n';
 
+        // cout << "Tag: " << this->cache[j].getTag() << endl;
+
         myFile << output;
 
-        
+        // cout << "Dato: " << this->cache[j].getBlock() << endl;
 
         output = " * Dato: " + BaseNParser::getBinaryString(this->cache[j].getBlock(), ADDRESS_SIZE) + "\n";
 
         myFile << output;
 
-        if ( j + 1 != (i + 1) * this->n_ways ) {
+        if (j + 1 != (i + 1) * this->n_ways)
+        {
           output = std::string(" ------------------- ") + "\n";
 
           myFile << output;
@@ -290,8 +510,6 @@ public:
 
     myFile.close();
   }
-
-
 
   void clearCache()
   {
@@ -312,9 +530,8 @@ public:
   ~SetAssociativeCache()
   {
 
-    this->cache.clear(); // esto es para eliminar cada elemento. No libera la memoria
+    this->cache.clear();         // esto es para eliminar cada elemento. No libera la memoria
     this->cache.shrink_to_fit(); // Esto es para liberar la memoria
-
   }
 };
 

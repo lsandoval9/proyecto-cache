@@ -253,7 +253,10 @@ void readBlocksFromFile()
         throw runtime_error("¡El numero ingresado no es valido!");
       }
 
-      std::cout << "\033[1m" << "Memory block:" << "\033[0m" << " " << input << std::endl;
+      std::cout << "\033[1m"
+                << "Memory block:"
+                << "\033[0m"
+                << " " << input << std::endl;
 
       globalSetAssociativeCache->saveBlockInCache(number);
 
@@ -262,10 +265,14 @@ void readBlocksFromFile()
     }
     catch (const std::exception &e)
     {
-      if (input != "" && input != "\n") {
+      if (input != "" && input != "\n")
+      {
         std::cout << "Error: No se ingreso un numero hexadecimal valido" << endl;
         std::cout << "Numero ingresado: '" << input << "'" << endl;
-        std::cout << "\033[1m" << "La línea fue ignorada" << "\033[0m" << std::endl << std::endl;
+        std::cout << "\033[1m"
+                  << "La línea fue ignorada"
+                  << "\033[0m" << std::endl
+                  << std::endl;
         std::cout << "-----------------" << endl;
       }
     }
@@ -275,7 +282,7 @@ void readBlocksFromFile()
 
   long hit_rate = std::round(globalSetAssociativeCache->getHitRate());
 
-  long accessCounter = globalSetAssociativeCache->getAccessCounter();
+  long accessCounter = globalSetAssociativeCache->getAccessTime();
 
   cout << endl
        << "*******************" << endl;

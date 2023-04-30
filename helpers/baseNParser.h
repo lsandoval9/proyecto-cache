@@ -8,6 +8,7 @@
 #include <map>
 #include <bitset>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ using namespace std;
 /**
  * @brief clase para parsear numeros hexadecimales a binarios y viceversa
  * tambien permite imprimir numeros con una base especifica
-*/
+ */
 class BaseNParser
 {
 
@@ -62,12 +63,12 @@ public:
     std::cout << "0b" << std::setfill('0') << std::setw(bits) << binaryStr;
   }
 
-
   /**
    * @brief convierte un numero decimal (long) a binario y lo imprime
    * con una cantidad de bits especifica
-  */
-  static string getBinaryString(long number, long bits) {
+   */
+  static string getBinaryString(long number, long bits)
+  {
 
     std::bitset<32> binary(number);             // convierte el número a binario con 32 bits
     std::string binaryStr = binary.to_string(); // convierte el número binario a una cadena de caracteres
@@ -85,8 +86,9 @@ public:
   /**
    * @brief convierte un numero decimal (long) a binario y transforma cada bit en un caracter
    * @returns string con los caracteres 0 y 1
-  */
-  static string toFixedString(double number, int precision ) {
+   */
+  static string toFixedString(double number, int precision)
+  {
 
     std::ostringstream out;
     out << std::fixed << std::setprecision(precision) << number;

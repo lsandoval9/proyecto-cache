@@ -19,44 +19,43 @@ using namespace std;
 
 #define CACHE_REQUEST_H
 
-
 /**
  * Clase que representa una solicitud de la cache hecha por el CPU
-*/
+ */
 class CacheRequest
 {
 
 private:
-/**
- * Direccion en binario de 32 bits
-*/
+  /**
+   * Direccion en binario de 32 bits
+   */
   long binaryAddress;
   /**
    * Tag de la request
-  */
+   */
   long tag;
   /**
    * Conjunto de la request
-  */
+   */
   long set;
   /**
    * Desplazamiento de la request
-  */
+   */
   long offset;
 
   // number of bits
 
   /**
    * Numero de bits para el tag
-  */
+   */
   size_t bitsInTag;
   /**
    * Numero de bits para el conjunto
-  */
+   */
   size_t bitsInSet;
   /**
    * Numero de bits para el desplazamiento
-  */
+   */
   size_t bitsInOffset;
 
 public:
@@ -103,7 +102,7 @@ public:
 
   /**
    * Imprime los valores de la request en binario
-  */
+   */
   void printRequest()
   {
     std::cout << "Address: ";
@@ -121,7 +120,6 @@ public:
     std::cout << "Offset: ";
     BaseNParser::printLongInBinary(this->offset, this->bitsInOffset);
     std::cout << std::endl;
-
   }
 
   ~CacheRequest()
