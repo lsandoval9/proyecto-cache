@@ -36,6 +36,18 @@ private:
    */
   long sets_in_cache;
 
+  /**
+   * Funcion para inicializar la caché
+   * Inserta líneas vacías en el vector de líneas de la cache con
+   * valid = false y access_time = -1 (-1 indica que no ha sido accedida)
+   */
+  void initializeCache()
+  {
+    this->cache = vector<CacheLine>(this->blocks_in_cache);
+
+    this->clearCache();
+  }
+
 public:
   SetAssociativeCache(long s_block, long s_cache, long n_ways) : BaseCache(s_block, s_cache)
   {
@@ -69,6 +81,8 @@ public:
     this->bitsInSet = log2(this->sets_in_cache);
 
     this->bitsInTag = ADDRESS_SIZE - bitsInSet - bitsInOffset;
+
+    this->access_time = 0;
 
     this->initializeCache();
   }
@@ -159,17 +173,12 @@ public:
 
       bool valid = this->cache[i].getValid();
 
-      cout << "tag: " << this->cache[i].getTag() << endl;
-      cout << "address: " << address << endl;
-
       if (valid && this->cache[i].getTag() == tag)
       {
 
         this->cache[i].setAccessCounter(this->cache[i].getAccessCounter() + 1);
 
         this->cache[i].setAccessTime(this->access_time);
-
-        this->access_time++;
 
         inserted = true;
 
@@ -191,11 +200,7 @@ public:
 
         this->cache[i].setAccessCounter(1);
 
-        this->access_time++;
-
         this->miss_counter++;
-
-        this->cache[i].setAccessCounter(1);
 
         inserted = true;
 
@@ -222,13 +227,10 @@ public:
 
       this->cache[leastUsed].setAccessTime(this->access_time);
 
-      this->access_time++;
-
       this->miss_counter++;
-
-      cout << "Replaced block: " << leastUsed << endl;
-      cout << "Tag: " << this->cache[leastUsed].getAccessCounter() << endl;
     }
+
+    this->access_time++;
 
     return isHit;
   }
@@ -259,8 +261,6 @@ public:
 
         this->cache[i].setAccessTime(this->access_time);
 
-        this->access_time++;
-
         inserted = true;
 
         isHit = true;
@@ -278,8 +278,6 @@ public:
         this->cache[i].setValid(true);
 
         this->cache[i].setAccessTime(this->access_time);
-
-        this->access_time++;
 
         this->miss_counter++;
 
@@ -306,10 +304,10 @@ public:
 
       this->cache[leastRecent].setAccessTime(this->access_time);
 
-      this->access_time++;
-
       this->miss_counter++;
     }
+
+    this->access_time++;
 
     return isHit;
   }
@@ -353,8 +351,6 @@ public:
 
         this->cache[i].setAccessTime(this->access_time);
 
-        this->access_time++;
-
         inserted = true;
 
         isHit = true;
@@ -372,8 +368,6 @@ public:
         this->cache[i].setValid(true);
 
         this->cache[i].setAccessTime(this->access_time);
-
-        this->access_time++;
 
         this->miss_counter++;
 
@@ -394,29 +388,15 @@ public:
 
       this->cache[randomBlock].setAccessTime(this->access_time);
 
-      this->access_time++;
-
       this->miss_counter++;
     }
+
+    this->access_time++;
 
     return isHit;
   }
 
-  /**
-   * Funcion para inicializar la caché
-   * Inserta líneas vacías en el vector de líneas de la cache con
-   * valid = false y access_time = -1 (-1 indica que no ha sido accedida)
-   */
-  void initializeCache()
-  {
-    this->cache = vector<CacheLine>(this->blocks_in_cache);
-
-    for (int i = 0; i < this->blocks_in_cache; i++)
-    {
-
-      this->cache[i] = CacheLine(false);
-    }
-  }
+  
 
   /**
    * Función para obtener las características de la caché
@@ -534,6 +514,9 @@ public:
   void clearCache()
   {
     this->access_time = 0;
+
+    this->miss_counter = 0;
+
     this->miss_counter = 0;
 
     for (int i = 0; i < this->blocks_in_cache; i++)

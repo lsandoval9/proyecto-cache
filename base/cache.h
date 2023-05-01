@@ -41,11 +41,6 @@ protected:
   size_t access_time;
 
   /**
-   * Contador de accesos a la caché
-   */
-  size_t access_counter;
-
-  /**
    * Contador de accesos fallidos a la caché
    */
   long miss_counter;

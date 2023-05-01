@@ -231,6 +231,8 @@ void imprimirInformacion()
 void readBlocksFromFile()
 {
 
+  globalSetAssociativeCache->clearCache();
+
   std::ifstream myFile("entradas.in");
   std::string line;
   int lineNumber = 0;
@@ -276,11 +278,15 @@ void readBlocksFromFile()
   cout << endl
        << "*******************" << endl;
 
-  std::cout << "Operaciones en total: " << accessCounter << endl;
+  std::cout << "Operaciones en total: " << std::dec << accessCounter << endl;
 
-  std::cout << " - Tasa de Aciertos: " << hit_rate << "%" << endl;
+  std::cout << " - Tasa de Aciertos: " << std::dec << hit_rate << "%" << endl;
 
-  std::cout << " - Tasa de Fallos: " << miss_rate << "%" << endl;
+  std:: cout << " * contador de aciertos: " << std::dec << globalSetAssociativeCache->getAccessTime() << endl;
+
+  std::cout << " - Tasa de Fallos: " << std::dec << miss_rate << "%" << endl;
+
+  std:: cout << " * contador de fallos: " << std::dec << globalSetAssociativeCache->getMissCounter() << endl;
 
   cout << "*******************" << endl;
 
