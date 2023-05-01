@@ -236,15 +236,20 @@ void readBlocksFromStructure()
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<long> dis(0, 4096);
-  // std::numeric_limits<long>::max()
+  // std::numeric_limits<long>::max() -> 32bits
   long address;
 
-  // Generate 4 random 64-bit hexadecimal addresses
+  // Generate 5000 random hexadecimal addresses
   std::vector<long> myVector;
   for (int i = 0; i < 5000; i++) {
     address = dis(gen);
     myVector.push_back(address);
   }
+
+  /**
+   * NOTA: separé la creación del vector y la lectura de las direcciones para poder hacer las pruebas sobre
+   * estructuras de datos distintas, en este caso, un vector como dijo el profesor.
+  */
 
   for (int i = 0; i < myVector.size(); i++)
   {
