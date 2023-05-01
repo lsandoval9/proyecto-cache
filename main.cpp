@@ -19,6 +19,9 @@
 #include <bitset>
 #include <fstream>
 #include <math.h>
+#include <vector>
+#include <random>
+#include <limits>
 
 using namespace std;
 
@@ -41,7 +44,7 @@ void finalizarPrograma();
 
 void imprimirInformacion();
 
-void readBlocksFromFile();
+void readBlocksFromStructure();
 
 void writeFeatures();
 
@@ -51,14 +54,13 @@ void writeFeatures();
  */
 int main(int argc, char const *argv[])
 {
-
   int input = -1;
 
   std::cout << "¡Bienvenido al programa de emulacion de una memoria cache!" << endl
             << endl;
 
   setValues();
-  readBlocksFromFile();
+  readBlocksFromStructure();
 
   while (input != 0)
   {
@@ -72,14 +74,14 @@ int main(int argc, char const *argv[])
     {
 
     case 1: // Imprimir prestaciones de la cache
-      readBlocksFromFile();
+      readBlocksFromStructure();
       break;
     case 2:
       writeFeatures();
       break;
     case 3: // Reiniciar valores
       setValues();
-      readBlocksFromFile();
+      readBlocksFromStructure();
       break;
     case 4: // imprimir informacion del programa
       imprimirInformacion();
@@ -197,7 +199,6 @@ void printMenu()
  */
 void finalizarPrograma()
 {
-
   std::cout << "\nFin del programa" << endl;
 
   delete globalSetAssociativeCache;
@@ -210,7 +211,6 @@ void finalizarPrograma()
  */
 void imprimirInformacion()
 {
-
   std::cout << "* Programa para emular el funcionamiento de una memoria cache simple" << endl;
 
   std::cout << "\nAutores: " << endl;
@@ -228,45 +228,33 @@ void imprimirInformacion()
   std::cout << "Profesor: Jose Canache" << endl;
 }
 
-void readBlocksFromFile()
+void readBlocksFromStructure()
 {
 
   globalSetAssociativeCache->clearCache();
 
-  std::ifstream myFile("entradas.in");
-  std::string line;
-  int lineNumber = 0;
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<long> dis(0, 4096);
+  // std::numeric_limits<long>::max()
+  long address;
 
-  while (std::getline(myFile, line))
+  // Generate 4 random 64-bit hexadecimal addresses
+  std::vector<long> myVector;
+  for (int i = 0; i < 5000; i++) {
+    address = dis(gen);
+    myVector.push_back(address);
+  }
+
+  for (int i = 0; i < myVector.size(); i++)
   {
-    lineNumber++;
-    std::istringstream iss(line);
-    long address;
-    char c;
-    if (!(iss >> std::hex >> address) || (iss.get(c) && c != '\n'))
-    {
-      std::cerr << "Error en la línea " << lineNumber << ": " << line << std::endl;
-      std::cerr << "Dirección en hexadecimal invalida: " << std::hex << address << std::endl;
-    }
-    else
-    {
-      std::cout << "Dirección en hexadecimal: " << std::hex << address << std::endl;
-
-      if (address > pow(2, 32) || address < 0)
-      {
-        throw runtime_error("¡El numero ingresado no es valido!");
-      }
-
-      std::cout << "\033[1m"
-                << "Memory block:"
-                << "\033[0m"
-                << " " << std::hex << address << std::endl;
-
-      globalSetAssociativeCache->saveBlockInCache(address);
-
-      std::cout << endl
-                << "-----------------" << endl;
-    }
+    address = myVector[i];
+    std::cout << "Dirección en hexadecimal: " << std::hex << address << std::endl;
+    std::cout << "\033[1m" << "Memory block:" << "\033[0m" << " " << std::hex << address << std::endl;
+    
+    globalSetAssociativeCache->saveBlockInCache(address);
+    
+    std::cout << std::endl << "-----------------" << std::endl;
   }
 
   double miss_rate = std::round(globalSetAssociativeCache->getMissRate() * 100) / 100;
@@ -275,7 +263,7 @@ void readBlocksFromFile()
 
   long accessCounter = globalSetAssociativeCache->getAccessTime();
 
-  cout << endl
+  std::cout << endl
        << "*******************" << endl;
 
   std::cout << "Operaciones en total: " << std::dec << accessCounter << endl;
@@ -288,89 +276,7 @@ void readBlocksFromFile()
 
   std:: cout << " * contador de fallos: " << std::dec << globalSetAssociativeCache->getMissCounter() << endl;
 
-  cout << "*******************" << endl;
-
-  myFile.close();
-}
-
-/**
- * Funcion para escribir las prestaciones de la cache y las entradas en un archivo
- */
-void readBlocksFromFile2()
-{
-
-  // Read hex numbers from a file where each number is separated by an endline
-
-  ifstream myFile;
-
-  myFile.open("entradas.in", ios::in);
-
-  globalSetAssociativeCache->clearCache();
-
-  if (!myFile.is_open())
-  {
-    throw runtime_error("¡No se pudo abrir el archivo!");
-  }
-
-  while (!myFile.eof())
-  {
-
-    string input;
-
-    getline(myFile, input);
-
-    try
-    {
-      long number = BaseNParser::parseHexStringToNumber(input);
-
-      if (number > pow(2, 32) || number < 0)
-      {
-        throw runtime_error("¡El numero ingresado no es valido!");
-      }
-
-      std::cout << "\033[1m"
-                << "Memory block:"
-                << "\033[0m"
-                << " " << input << std::endl;
-
-      globalSetAssociativeCache->saveBlockInCache(number);
-
-      std::cout << endl
-                << "-----------------" << endl;
-    }
-    catch (const std::exception &e)
-    {
-      if (input != "" && input != "\n")
-      {
-        std::cout << "Error: No se ingreso un numero hexadecimal valido" << endl;
-        std::cout << "Numero ingresado: '" << input << "'" << endl;
-        std::cout << "\033[1m"
-                  << "La línea fue ignorada"
-                  << "\033[0m" << std::endl
-                  << std::endl;
-        std::cout << "-----------------" << endl;
-      }
-    }
-  }
-
-  double miss_rate = std::round(globalSetAssociativeCache->getMissRate() * 100) / 100;
-
-  double hit_rate = std::round(globalSetAssociativeCache->getHitRate() * 100) / 100;
-
-  long accessCounter = globalSetAssociativeCache->getAccessTime();
-
-  cout << endl
-       << "*******************" << endl;
-
-  std::cout << "Operaciones en total: " << accessCounter << endl;
-
-  std::cout << " - Tasa de Aciertos: " << hit_rate << "%" << endl;
-
-  std::cout << " - Tasa de Fallos: " << miss_rate << "%" << endl;
-
-  cout << "*******************" << endl;
-
-  myFile.close();
+  std::cout << "*******************" << endl;
 }
 
 /**
@@ -378,6 +284,5 @@ void readBlocksFromFile2()
  */
 void writeFeatures()
 {
-
   globalSetAssociativeCache->printFeatures();
 }
