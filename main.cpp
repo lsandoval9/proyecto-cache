@@ -275,7 +275,7 @@ void readBlocksFromStructure()
 
   std::cout << " - Tasa de Aciertos: " << std::dec << hit_rate << "%" << endl;
 
-  std:: cout << " * contador de aciertos: " << std::dec << globalSetAssociativeCache->getAccessTime() << endl;
+  std:: cout << " * contador de accesos: " << std::dec << globalSetAssociativeCache->getAccessTime() << endl;
 
   std::cout << " - Tasa de Fallos: " << std::dec << miss_rate << "%" << endl;
 
