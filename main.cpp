@@ -233,16 +233,40 @@ void readBlocksFromStructure()
 
   globalSetAssociativeCache->clearCache();
 
+  /*
+  // Random address generator (0 - 2^32) uniform distribution
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<long> dis(0, 4096);
-  // std::numeric_limits<long>::max() -> 32bits
+  std::uniform_int_distribution<long> dis(0, std::numeric_limits<long>::max());
+  // std::uniform_int_distribution<long> dis(0, 4096);
   long address;
 
   // Generate 5000 random hexadecimal addresses
   std::vector<long> myVector;
   for (int i = 0; i < 5000; i++) {
     address = dis(gen);
+    myVector.push_back(address);
+  }
+  */
+
+  // Random address generator (0 - 2^32) normal distribution (favors nearby addresses)
+  std::random_device rd;
+  std::mt19937 generator(rd());
+
+  // Define a distribution that favors nearby addresses
+  std::normal_distribution<> distribution(0, 100);
+
+  // Generate 5000 addresses and store them in an array
+  std::vector<long> myVector;
+  long address = 0x00000000;
+  for (int i = 0; i < 10000; i++) {
+    int increment = static_cast<int>(distribution(generator));
+    if (address + increment < 0) {
+      increment = -static_cast<int>(address);
+    } else if (address + increment > 0xFFFFFFFF) {
+      increment = 0xFFFFFFFF - static_cast<int>(address);
+    }
+    address += static_cast<uint32_t>(increment);
     myVector.push_back(address);
   }
 
