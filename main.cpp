@@ -248,7 +248,8 @@ void readBlocksFromStructure()
     myVector.push_back(address);
   }
   */
-
+  
+  /*
   // Random address generator (0 - 2^32) normal distribution (favors nearby addresses)
   std::random_device rd;
   std::mt19937 generator(rd());
@@ -257,8 +258,8 @@ void readBlocksFromStructure()
   std::normal_distribution<> distribution(0, 100);
 
   // Generate 5000 addresses and store them in an array
-  std::vector<long> myVector;
-  long address = 0x00000000;
+  std::vector<uint32_t> myVector;
+  uint32_t address = 0x00000000;
   for (int i = 0; i < 10000; i++) {
     int increment = static_cast<int>(distribution(generator));
     if (address + increment < 0) {
@@ -267,6 +268,46 @@ void readBlocksFromStructure()
       increment = 0xFFFFFFFF - static_cast<int>(address);
     }
     address += static_cast<uint32_t>(increment);
+    myVector.push_back(address);
+  }
+  */
+
+  // Random address generator (0 - 2^32) Zipf distribution
+  std::random_device rd;
+  std::mt19937 generator(rd());
+
+  // Define the parameters of the Zipf distribution
+  uint32_t n = 0xFFFF; // on 2^16 because 2^32 was really expensive for the harmonic number
+  double s = 1.5; // Change this value to change the skew of the distribution (higher values = more skew(less probabilty of same ranks))
+
+  /** A higher value of s produces more skewed distributions with fewer high-frequency rank values,
+   * while a lower value of s produces less skewed
+   * distributions with more high-frequency rank values.
+  */
+
+  // Compute the harmonic number for H(n, s)
+  double H_n_s = 0;
+  std::cout << "Calculando H(n, s)..." << std::endl;
+  for (uint32_t i = 1; i <= n; i++) {
+      H_n_s += 1.0 / std::pow(i, s);
+  }
+
+  // Generate addresses and store them in a vector
+  std::vector<uint32_t> myVector;
+  uint32_t address;
+  std::cout << "Generando direcciones..." << std::endl;
+  for (int i = 0; i < 5000; i++) {
+    // Generate a rank value according to the Zipf distribution
+    double u = std::generate_canonical<double, 10>(generator);
+    uint32_t k = 1;
+    double p = 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+    while (u > p && k < n) {
+        k++;
+        p += 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+    }
+
+    // Compute the address corresponding to the rank value
+    address = k;
     myVector.push_back(address);
   }
 
