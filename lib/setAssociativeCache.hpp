@@ -10,7 +10,6 @@
 #include "../base/cache.hpp"
 #include "../lib/CacheLine.hpp"
 #include "../lib/CacheRequest.hpp"
-#include "../lib/PrefetchBuffer.hpp"
 
 using namespace std;
 
@@ -37,10 +36,7 @@ private:
    */
   long sets_in_cache;
 
-  /**
-   * Buffer de prefetching
-   */
-  PrefetchBuffer *prefetchBuffer;
+  
 
   /**
    * Funcion para inicializar la caché
@@ -71,8 +67,6 @@ public:
     this->bitsInTag = ADDRESS_SIZE - bitsInSet - bitsInOffset;
 
     this->initializeCache();
-
-    this->prefetchBuffer = new PrefetchBuffer();
   }
 
   SetAssociativeCache(long s_block, long s_cache, long n_ways, short replacePolicy) : BaseCache(s_block, s_cache, replacePolicy)
@@ -94,7 +88,7 @@ public:
 
     this->initializeCache();
 
-    this->prefetchBuffer = new PrefetchBuffer();
+    
   }
 
   /**
@@ -147,38 +141,36 @@ public:
     if (!isInBuffer)
     {
       this->prefetchBuffer->clearBuffer();
+
+      this->prefetchBuffer->storeAdjacentBlocks(request);
+
+      switch (this->replacePolicy)
+      {
+      case 0:
+        isHit = this->insertBlockLRU(currentBlock, tag, address);
+        break;
+      case 1:
+        isHit = this->insertBlockLFU(currentBlock, tag, address);
+        break;
+      case 2:
+        isHit = this->insertBlockRandom(currentBlock, tag, address);
+        break;
+      }
     }
     else
     {
-      this->incrementAccessTime();
-    }
-
-    switch (this->replacePolicy)
-    {
-    case 0:
-      isHit = this->insertBlockLRU(currentBlock, tag, address);
-      break;
-    case 1:
-      isHit = this->insertBlockLFU(currentBlock, tag, address);
-      break;
-    case 2:
-      isHit = this->insertBlockRandom(currentBlock, tag, address);
-      break;
+      // this->prefetchBuffer->incrementAccessTime();
     }
 
     string hitOrMiss;
-    if (isInBuffer)
-    {
-      hitOrMiss = "Buffer hit";
-    }
-    else
-    {
-      hitOrMiss = isHit ? "Hit" : "Miss";
-    }
+
+    hitOrMiss = isHit || isInBuffer ? "Hit" : "Miss";
 
     std::cout << "\033[1m"
               << "H/M: "
               << "\033[0m" << hitOrMiss << std::endl;
+
+    delete request;
   }
 
   /**

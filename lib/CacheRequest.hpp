@@ -11,7 +11,7 @@
 
 // librerias propias
 
-#include "../base/cache.hpp"
+
 #include "../helpers/baseNParser.hpp"
 
 using namespace std;
@@ -99,6 +99,21 @@ public:
   long getBinaryAddress()
   {
     return this->binaryAddress;
+  }
+
+  long getBitsInTag()
+  {
+    return this->bitsInTag;
+  }
+
+  long getBitsInSet()
+  {
+    return this->bitsInSet;
+  }
+
+  long getBitsInOffset()
+  {
+    return this->bitsInOffset;
   }
 
   /**

@@ -237,11 +237,11 @@ void readBlocksFromStructure()
     uint32_t minValue = 0;
     uint32_t maxValue = 0xFFFFFFFF;
 
-    // Define la probabilidad de generar un valor repetido (20% en este ejemplo)
-    double repeatProbability = 0.2;
+    // Define la probabilidad de generar un valor repetido (tira un dado)
+    double repeatProbability = 0.3;
 
-    // Define la probabilidad de generar un valor adyacente (10% en este ejemplo)
-    double adjacentProbability = 0.6;
+    // Define la probabilidad de generar un valor adyacente (tira un dado)
+    double adjacentProbability = 0.9;
 
     // Inicializa el generador de números aleatorios
     std::random_device rd;

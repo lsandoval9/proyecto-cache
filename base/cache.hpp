@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "../constants/constants.hpp"
+#include "../lib/prefetchBuffer.hpp"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ protected:
   /**
    * Contador de accesos fallidos a la caché
    */
-  long miss_counter;
+  size_t miss_counter;
 
   /**
    * Tamaño del desplazamiento en bits (desplazamiento de palabra + desplazamiento de byte)
@@ -69,6 +70,11 @@ protected:
    */
   short replacePolicy;
 
+  /**
+   * Buffer de prefetching
+   */
+  PrefetchBuffer *prefetchBuffer;
+
 public:
   BaseCache(long s_block, long s_cache, short replacePolicy = 0)
   {
@@ -79,6 +85,8 @@ public:
     this->replacePolicy = replacePolicy;
 
     this->calculateBlocksInCache();
+
+    this->prefetchBuffer = new PrefetchBuffer();
   }
 
   // metodos virtuales puros
@@ -115,12 +123,14 @@ public:
   double getMissRate()
   {
 
-    if (this->access_time == 0)
+    if (this->access_time == 0 && this->prefetchBuffer->getAccessTime() == 0)
     {
       return 0;
     }
 
-    return ((double)this->miss_counter / (double)this->access_time) * 100;
+    long total_miss = this->miss_counter + this->prefetchBuffer->getMissCounter();
+
+    return ((double)total_miss / (double)this->getTotalAccessTime()) * 100;
   }
 
   /**
@@ -142,6 +152,11 @@ public:
     return this->access_time;
   }
 
+  size_t getTotalAccessTime()
+  {
+    return this->access_time + this->prefetchBuffer->getAccessTime();
+  }
+
   long getSBlock()
   {
     return this->s_block;
@@ -152,7 +167,7 @@ public:
     return this->s_cache;
   }
 
-  long getMissCounter()
+  size_t getMissCounter()
   {
     return this->miss_counter;
   }

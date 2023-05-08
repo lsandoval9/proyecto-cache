@@ -65,7 +65,7 @@ public:
     this->tag = 0;
   }
 
-  CacheLine(long tag, bool valid, long offset, long set)
+  CacheLine(long tag, bool valid, long block)
   {
     this->tag = tag;
     this->valid = valid;
