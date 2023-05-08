@@ -30,15 +30,23 @@ using namespace std;
 #include "lib/setAssociativeCache.hpp"
 #include "include/json.hpp"
 
+using json = nlohmann::json;
+
 // variables globales
 
 SetAssociativeCache *globalSetAssociativeCache; // Cache para correspondencia por conjuntos de n vias
+
+nlohmann::json config; // Configuracion del programa
 
 // prototipos de funciones
 
 void printMenu();
 
-void setValues();
+void setValuesFromCIN();
+
+void setValuesFromConfig();
+
+void initializeCache(long s_block, long s_cache, long n_ways, short replacementPolicy);
 
 void finalizarPrograma();
 
@@ -54,43 +62,72 @@ void writeFeatures();
  */
 int main(int argc, char const *argv[])
 {
+
+  bool loadConfig = false;
+
+  if (argc > 1)
+  {
+
+    int parameter = std::stoi(argv[1]);
+
+    loadConfig = parameter != 0;
+  }
+
   int input = -1;
 
   std::cout << "¡Bienvenido al programa de emulacion de una memoria cache!" << endl
             << endl;
 
-  setValues();
-  readBlocksFromStructure();
-
-  while (input != 0)
+  if (loadConfig)
   {
 
-    std::cout << endl;
-    printMenu();
-    cin >> input;
-    std::cout << endl;
+    cout << "Cargando configuracion..." << endl;
 
-    switch (input)
+    setValuesFromConfig();
+
+    readBlocksFromStructure();
+
+    writeFeatures();
+
+    cout << endl;
+    
+    imprimirInformacion();
+  }
+  else
+  {
+    setValuesFromCIN();
+    readBlocksFromStructure();
+
+    while (input != 0)
     {
 
-    case 1: // Imprimir prestaciones de la cache
-      readBlocksFromStructure();
-      break;
-    case 2:
-      writeFeatures();
-      break;
-    case 3: // Reiniciar valores
-      setValues();
-      readBlocksFromStructure();
-      break;
-    case 4: // imprimir informacion del programa
-      imprimirInformacion();
-      break;
-    case 0: // Salir
-      finalizarPrograma();
-      break;
-    default:
-      std::cout << "¡Opcion invalida!";
+      std::cout << endl;
+      printMenu();
+      cin >> input;
+      std::cout << endl;
+
+      switch (input)
+      {
+
+      case 1: // Imprimir prestaciones de la cache
+        readBlocksFromStructure();
+        break;
+      case 2:
+        writeFeatures();
+        break;
+      case 3: // Reiniciar valores
+        setValuesFromCIN();
+        readBlocksFromStructure();
+        break;
+      case 4: // imprimir informacion del programa
+        imprimirInformacion();
+        break;
+      case 0: // Salir
+        finalizarPrograma();
+        break;
+      default:
+        std::cout << "¡Opcion invalida!";
+      }
     }
   }
 
@@ -105,7 +142,7 @@ int main(int argc, char const *argv[])
  * @param s_cache Tamaño de la cache
  * @param n_ways Numero de vias
  */
-void setValues()
+void setValuesFromCIN()
 {
   long s_block; // Tamaño del bloque en palabras de 32 bits
 
@@ -133,6 +170,31 @@ void setValues()
   std::cout << "Ingrese la politica de reemplazo (0: LRU, 1: LFU, 2: RANDOM)" << endl;
   std::cout << "> ";
   std::cin >> replacementPolicy;
+
+  initializeCache(s_block, s_cache, n_ways, replacementPolicy);
+}
+
+void setValuesFromConfig()
+{
+
+  // Abrir el archivo JSON
+  std::ifstream file("config.json");
+
+  // Analizar la cadena JSON
+  config = json::parse(file);
+
+  long s_block = WORDS_PER_BLOCK;                   // Tamaño del bloque en palabras de 32 bits (4 bytes)
+  long s_cache = config["s_cache"];                   // Tamaño de la cache en KBs
+  long n_ways = config["n_ways"];                     // Numero de vias
+  short replacementPolicy = config["replace_policy"]; // Politica de reemplazo
+
+  initializeCache(s_block, s_cache, n_ways, replacementPolicy);
+
+  file.close();
+}
+
+void initializeCache(long s_block, long s_cache, long n_ways, short replacementPolicy)
+{
 
   long blockInCache = s_cache * 1024 / (s_block * 4);
 
@@ -233,40 +295,45 @@ void readBlocksFromStructure()
 
   globalSetAssociativeCache->clearCache();
 
-    // Define el rango de valores
-    uint32_t minValue = 0;
-    uint32_t maxValue = 0xFFFFFFFF;
+  // Define el rango de valores
+  uint32_t minValue = 0;
+  uint32_t maxValue = 0xFFFFFFFF;
 
-    // Define la probabilidad de generar un valor repetido (tira un dado)
-    double repeatProbability = 0.3;
+  // Define la probabilidad de generar un valor repetido (tira un dado)
+  double repeatProbability = 0.2;
 
-    // Define la probabilidad de generar un valor adyacente (tira un dado)
-    double adjacentProbability = 0.9;
+  // Define la probabilidad de generar un valor adyacente (tira un dado)
+  double adjacentProbability = 0.8;
 
-    // Inicializa el generador de números aleatorios
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_int_distribution<uint32_t> distribution(minValue, maxValue);
+  // Inicializa el generador de números aleatorios
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  std::uniform_int_distribution<uint32_t> distribution(minValue, maxValue);
 
-    // Genera valores aleatorios y llama a la función
-    std::vector<uint32_t> values;
-    uint32_t previousValue = 0;
-    for (int i = 0; i < 5000; i++) {
-        uint32_t value = distribution(generator);
-        if (i > 0) {
-            if (std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= repeatProbability) {
-                // Repetir un valor anterior
-                int index = std::uniform_int_distribution<int>(0, i - 1)(generator);
-                value = values[index];
-            } else if (std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= adjacentProbability) {
-                // Generar un valor adyacente al valor anterior
-                int sign = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= 0.5 ? -1 : 1;
-                value = previousValue + sign;
-            }
-        }
-        values.push_back(value);
-        previousValue = value;
+  // Genera valores aleatorios y llama a la función
+  std::vector<uint32_t> values;
+  uint32_t previousValue = 0;
+  for (int i = 0; i < 5000; i++)
+  {
+    uint32_t value = distribution(generator);
+    if (i > 0)
+    {
+      if (std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= repeatProbability)
+      {
+        // Repetir un valor anterior
+        int index = std::uniform_int_distribution<int>(0, i - 1)(generator);
+        value = values[index];
+      }
+      else if (std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= adjacentProbability)
+      {
+        // Generar un valor adyacente al valor anterior
+        int sign = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= 0.5 ? -1 : 1;
+        value = previousValue + sign;
+      }
     }
+    values.push_back(value);
+    previousValue = value;
+  }
 
   for (int i = 0; i < values.size(); i++)
   {
