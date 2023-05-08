@@ -7,11 +7,12 @@
 
 // constantes
 
-#include "../constants/constants.h"
+#include "../constants/constants.hpp"
 
 // librerias propias
 
-#include "../base/cache.h"
+#include "../base/cache.hpp"
+#include "../helpers/baseNParser.hpp"
 
 using namespace std;
 

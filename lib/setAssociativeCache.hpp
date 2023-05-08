@@ -7,9 +7,10 @@
 
 // librerias propias
 
-#include "../base/cache.h"
-#include "../lib/CacheLine.h"
-#include "../lib/CacheRequest.h"
+#include "../base/cache.hpp"
+#include "../lib/CacheLine.hpp"
+#include "../lib/CacheRequest.hpp"
+#include "../lib/PrefetchBuffer.hpp"
 
 using namespace std;
 
@@ -35,6 +36,11 @@ private:
    * Número de conjuntos de la caché
    */
   long sets_in_cache;
+
+  /**
+   * Buffer de prefetching
+   */
+  PrefetchBuffer *prefetchBuffer;
 
   /**
    * Funcion para inicializar la caché
@@ -65,6 +71,8 @@ public:
     this->bitsInTag = ADDRESS_SIZE - bitsInSet - bitsInOffset;
 
     this->initializeCache();
+
+    this->prefetchBuffer = new PrefetchBuffer();
   }
 
   SetAssociativeCache(long s_block, long s_cache, long n_ways, short replacePolicy) : BaseCache(s_block, s_cache, replacePolicy)
@@ -85,6 +93,8 @@ public:
     this->access_time = 0;
 
     this->initializeCache();
+
+    this->prefetchBuffer = new PrefetchBuffer();
   }
 
   /**
@@ -132,6 +142,17 @@ public:
 
     bool isHit = false;
 
+    bool isInBuffer = this->prefetchBuffer->checkBuffer(address);
+
+    if (!isInBuffer)
+    {
+      this->prefetchBuffer->clearBuffer();
+    }
+    else
+    {
+      this->incrementAccessTime();
+    }
+
     switch (this->replacePolicy)
     {
     case 0:
@@ -145,11 +166,19 @@ public:
       break;
     }
 
-    string hitOrMis = isHit ? "Hit" : "Miss";
+    string hitOrMiss;
+    if (isInBuffer)
+    {
+      hitOrMiss = "Buffer hit";
+    }
+    else
+    {
+      hitOrMiss = isHit ? "Hit" : "Miss";
+    }
 
     std::cout << "\033[1m"
               << "H/M: "
-              << "\033[0m" << hitOrMis << std::endl;
+              << "\033[0m" << hitOrMiss << std::endl;
   }
 
   /**
@@ -395,8 +424,6 @@ public:
 
     return isHit;
   }
-
-  
 
   /**
    * Función para obtener las características de la caché

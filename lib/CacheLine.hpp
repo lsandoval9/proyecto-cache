@@ -7,7 +7,7 @@
 
 // constantes
 
-#include "../constants/constants.h"
+#include "../constants/constants.hpp"
 
 // librerias propias
 
@@ -70,6 +70,15 @@ public:
     this->tag = tag;
     this->valid = valid;
     this->block = block;
+  }
+
+  CacheLine(CacheLine &cacheLine)
+  {
+    this->tag = cacheLine.getTag();
+    this->valid = cacheLine.getValid();
+    this->block = cacheLine.getBlock();
+    this->accessTime = cacheLine.getAccessTime();
+    this->accessCounter = cacheLine.getAccessCounter();
   }
 
   // getters y setters

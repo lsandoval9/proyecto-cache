@@ -9,7 +9,7 @@
 
 // constantes
 
-#include "./constants/constants.h"
+#include "./constants/constants.hpp"
 
 #include <iostream>
 #include <string>
@@ -21,14 +21,14 @@
 #include <math.h>
 #include <vector>
 #include <random>
-#include <limits>
 
 using namespace std;
 
 // librerias propias
 
-#include "helpers/baseNParser.h"
-#include "lib/setAssociativeCache.h"
+#include "helpers/baseNParser.hpp"
+#include "lib/setAssociativeCache.hpp"
+#include "include/json.hpp"
 
 // variables globales
 
@@ -233,98 +233,54 @@ void readBlocksFromStructure()
 
   globalSetAssociativeCache->clearCache();
 
-  /*
-  // Random address generator (0 - 2^32) uniform distribution
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<long> dis(0, std::numeric_limits<long>::max());
-  // std::uniform_int_distribution<long> dis(0, 4096);
-  long address;
+    // Define el rango de valores
+    uint32_t minValue = 0;
+    uint32_t maxValue = 0xFFFFFFFF;
 
-  // Generate 5000 random hexadecimal addresses
-  std::vector<long> myVector;
-  for (int i = 0; i < 5000; i++) {
-    address = dis(gen);
-    myVector.push_back(address);
-  }
-  */
-  
-  /*
-  // Random address generator (0 - 2^32) normal distribution (favors nearby addresses)
-  std::random_device rd;
-  std::mt19937 generator(rd());
+    // Define la probabilidad de generar un valor repetido (20% en este ejemplo)
+    double repeatProbability = 0.2;
 
-  // Define a distribution that favors nearby addresses
-  std::normal_distribution<> distribution(0, 100);
+    // Define la probabilidad de generar un valor adyacente (10% en este ejemplo)
+    double adjacentProbability = 0.6;
 
-  // Generate 5000 addresses and store them in an array
-  std::vector<uint32_t> myVector;
-  uint32_t address = 0x00000000;
-  for (int i = 0; i < 10000; i++) {
-    int increment = static_cast<int>(distribution(generator));
-    if (address + increment < 0) {
-      increment = -static_cast<int>(address);
-    } else if (address + increment > 0xFFFFFFFF) {
-      increment = 0xFFFFFFFF - static_cast<int>(address);
-    }
-    address += static_cast<uint32_t>(increment);
-    myVector.push_back(address);
-  }
-  */
+    // Inicializa el generador de números aleatorios
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<uint32_t> distribution(minValue, maxValue);
 
-  // Random address generator (0 - 2^32) Zipf distribution
-  std::random_device rd;
-  std::mt19937 generator(rd());
-
-  // Define the parameters of the Zipf distribution
-  uint32_t n = 0xFFFF; // on 2^16 because 2^32 was really expensive for the harmonic number
-  double s = 1.5; // Change this value to change the skew of the distribution (higher values = more skew(less probabilty of same ranks))
-
-  /** A higher value of s produces more skewed distributions with fewer high-frequency rank values,
-   * while a lower value of s produces less skewed
-   * distributions with more high-frequency rank values.
-  */
-
-  // Compute the harmonic number for H(n, s)
-  double H_n_s = 0;
-  std::cout << "Calculando H(n, s)..." << std::endl;
-  for (uint32_t i = 1; i <= n; i++) {
-      H_n_s += 1.0 / std::pow(i, s);
-  }
-
-  // Generate addresses and store them in a vector
-  std::vector<uint32_t> myVector;
-  uint32_t address;
-  std::cout << "Generando direcciones..." << std::endl;
-  for (int i = 0; i < 5000; i++) {
-    // Generate a rank value according to the Zipf distribution
-    double u = std::generate_canonical<double, 10>(generator);
-    uint32_t k = 1;
-    double p = 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
-    while (u > p && k < n) {
-        k++;
-        p += 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+    // Genera valores aleatorios y llama a la función
+    std::vector<uint32_t> values;
+    uint32_t previousValue = 0;
+    for (int i = 0; i < 5000; i++) {
+        uint32_t value = distribution(generator);
+        if (i > 0) {
+            if (std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= repeatProbability) {
+                // Repetir un valor anterior
+                int index = std::uniform_int_distribution<int>(0, i - 1)(generator);
+                value = values[index];
+            } else if (std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= adjacentProbability) {
+                // Generar un valor adyacente al valor anterior
+                int sign = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator) <= 0.5 ? -1 : 1;
+                value = previousValue + sign;
+            }
+        }
+        values.push_back(value);
+        previousValue = value;
     }
 
-    // Compute the address corresponding to the rank value
-    address = k;
-    myVector.push_back(address);
-  }
-
-  /**
-   * NOTA: separé la creación del vector y la lectura de las direcciones para poder hacer las pruebas sobre
-   * estructuras de datos distintas, en este caso, un vector como dijo el profesor.
-  */
-
-  for (int i = 0; i < myVector.size(); i++)
+  for (int i = 0; i < values.size(); i++)
   {
-    address = myVector[i];
+    long address = values[i];
     std::cout << "Dirección en hexadecimal: " << std::hex << address << std::endl;
-    std::cout << "\033[1m" << "Memory block:" << "\033[0m" << " " << std::hex << address << std::endl;
-    
+    std::cout << "\033[1m"
+              << "Memory block:"
+              << "\033[0m"
+              << " " << std::hex << address << std::endl;
+
     globalSetAssociativeCache->saveBlockInCache(address);
-    
-    std::cout << std::endl << "-----------------" << std::endl;
+
+    std::cout << std::endl
+              << "-----------------" << std::endl;
   }
 
   double miss_rate = std::round(globalSetAssociativeCache->getMissRate() * 100) / 100;
@@ -334,17 +290,17 @@ void readBlocksFromStructure()
   long accessCounter = globalSetAssociativeCache->getAccessTime();
 
   std::cout << endl
-       << "*******************" << endl;
+            << "*******************" << endl;
 
   std::cout << "Operaciones en total: " << std::dec << accessCounter << endl;
 
   std::cout << " - Tasa de Aciertos: " << std::dec << hit_rate << "%" << endl;
 
-  std:: cout << " * contador de accesos: " << std::dec << globalSetAssociativeCache->getAccessTime() << endl;
+  std::cout << " * contador de accesos: " << std::dec << globalSetAssociativeCache->getAccessTime() << endl;
 
   std::cout << " - Tasa de Fallos: " << std::dec << miss_rate << "%" << endl;
 
-  std:: cout << " * contador de fallos: " << std::dec << globalSetAssociativeCache->getMissCounter() << endl;
+  std::cout << " * contador de fallos: " << std::dec << globalSetAssociativeCache->getMissCounter() << endl;
 
   std::cout << "*******************" << endl;
 }

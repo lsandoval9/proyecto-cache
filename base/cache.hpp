@@ -3,7 +3,7 @@
 #include <vector>
 #include <math.h>
 
-#include "../constants/constants.h"
+#include "../constants/constants.hpp"
 
 using namespace std;
 
@@ -137,6 +137,11 @@ public:
     return 100 - this->getMissRate();
   }
 
+  size_t getAccessTime()
+  {
+    return this->access_time;
+  }
+
   long getSBlock()
   {
     return this->s_block;
@@ -145,11 +150,6 @@ public:
   long getSCache()
   {
     return this->s_cache;
-  }
-
-  long getAccessTime()
-  {
-    return this->access_time;
   }
 
   long getMissCounter()
@@ -200,6 +200,16 @@ public:
   void setReplacePolicy(short replacePolicy)
   {
     this->replacePolicy = replacePolicy;
+  }
+
+  void setAccessTime(size_t access_time)
+  {
+    this->access_time = access_time;
+  }
+
+  void incrementAccessTime()
+  {
+    this->access_time++;
   }
 
   void setBlocksInCache(long blocks_in_cache)
