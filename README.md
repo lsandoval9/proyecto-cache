@@ -48,6 +48,42 @@ o si no se tiene instalado make:
   g++ -std=c++11 main.cpp -o RUN.out && ./RUN.out
 ```
 
+## Configuración
+
+El programa admite un archivo de configuracion llamado config.json, el cual contiene los parametros de la memoria cache, los cuales son:
+
+- **tamaño**(s_cache): tamaño de la memoria cache en KB
+- **vias**(n_ways): numero de vias de la memoria cache
+- **Politica de reemplazo**(replace_policy): politica de reemplazo de la cache **(0: LRU, 1: LFU, 2: RANDOM)**
+
+ejemplo del archivo:
+
+```json
+{
+  "s_cache": 1,
+  "n_ways": 1,
+  "replace_policy": 0
+}
+```
+
+para indicarle al programa que lea el archivo en vez de solicitar los valores de la cache al usuario, se debe ejecutar el programa con un argumento booleano donde 1 es para leer el archivo y 0 para no leerlo, por ejemplo:
+
+```bash
+EJECUTAR.sh 1
+```
+
+tambien se puede ejecutar sin el uso del script o del make:
+
+```bash
+  make && ./RUN.out 1
+```
+
+o si no se tiene instalado make:
+
+```bash
+  g++ -std=c++11 main.cpp -o RUN.out && ./RUN.out 1
+```
+
 ## Funcionamiento
 
 El programa le dara la bienvenida al usuario y le pedira que ingrese los parametros de la memoria cache, correspondientes al tamaño de la memoria cache en KB y el numero de vias. **Ambos parametros deben ser potencias de 2.**

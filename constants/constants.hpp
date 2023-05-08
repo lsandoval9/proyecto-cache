@@ -15,3 +15,9 @@
 #define WORDS_PER_BLOCK 4 // Numero de palabras por bloque
 
 #endif
+
+#ifndef MAX_ADDRESS
+
+#define MAX_ADDRESS 0xFFFFFFFF // Direccion maxima
+
+#endif

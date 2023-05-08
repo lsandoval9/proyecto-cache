@@ -7,9 +7,9 @@
 
 // librerias propias
 
-#include "../base/cache.h"
-#include "../lib/CacheLine.h"
-#include "../lib/CacheRequest.h"
+#include "../base/cache.hpp"
+#include "../lib/CacheLine.hpp"
+#include "../lib/CacheRequest.hpp"
 
 using namespace std;
 
@@ -35,6 +35,8 @@ private:
    * Número de conjuntos de la caché
    */
   long sets_in_cache;
+
+  
 
   /**
    * Funcion para inicializar la caché
@@ -85,6 +87,8 @@ public:
     this->access_time = 0;
 
     this->initializeCache();
+
+    
   }
 
   /**
@@ -132,24 +136,41 @@ public:
 
     bool isHit = false;
 
-    switch (this->replacePolicy)
+    bool isInBuffer = this->prefetchBuffer->checkBuffer(address);
+
+    if (!isInBuffer)
     {
-    case 0:
-      isHit = this->insertBlockLRU(currentBlock, tag, address);
-      break;
-    case 1:
-      isHit = this->insertBlockLFU(currentBlock, tag, address);
-      break;
-    case 2:
-      isHit = this->insertBlockRandom(currentBlock, tag, address);
-      break;
+      this->prefetchBuffer->clearBuffer();
+
+      this->prefetchBuffer->storeAdjacentBlocks(request);
+
+      switch (this->replacePolicy)
+      {
+      case 0:
+        isHit = this->insertBlockLRU(currentBlock, tag, address);
+        break;
+      case 1:
+        isHit = this->insertBlockLFU(currentBlock, tag, address);
+        break;
+      case 2:
+        isHit = this->insertBlockRandom(currentBlock, tag, address);
+        break;
+      }
+    }
+    else
+    {
+      // this->prefetchBuffer->incrementAccessTime();
     }
 
-    string hitOrMis = isHit ? "Hit" : "Miss";
+    string hitOrMiss;
+
+    hitOrMiss = isHit || isInBuffer ? "Hit" : "Miss";
 
     std::cout << "\033[1m"
               << "H/M: "
-              << "\033[0m" << hitOrMis << std::endl;
+              << "\033[0m" << hitOrMiss << std::endl;
+
+    delete request;
   }
 
   /**
@@ -395,8 +416,6 @@ public:
 
     return isHit;
   }
-
-  
 
   /**
    * Función para obtener las características de la caché
