@@ -64,6 +64,8 @@ void normalDistribution(std::vector<uint32_t> &values, int numberOfAddresses);
 
 void zipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses);
 
+void MZipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses, uint32_t maxAddress);
+
 /**
  * Programa para emular el funcionamiento de una memoria cache para correspondencia directa y
  * asociativa por conjuntos
@@ -180,7 +182,7 @@ void setValuesFromCIN(int &addressDistribution)
   std::cout << "> ";
   std::cin >> replacementPolicy;
 
-  std::cout << "Ingrese la politica de distribución de direcciones (0: Augustus, 1: Uniforme[2^32], 2: Normal, 3: Zipf[slow])" << endl;
+  std::cout << "Ingrese la politica de distribución de direcciones (0: Augustus, 1: Uniforme[2^32], 2: Uniforme[2^16], 3: Normal, 4: Zipf[slow], 5: MZipf[slow])" << endl;
   std::cout << "> ";
   std::cin >> addressDistribution;
 
@@ -323,7 +325,7 @@ void augustusDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
 
   // Genera valores aleatorios y llama a la función
   uint32_t previousValue = 0;
-  for (int i = 0; i < 3000; i++)
+  for (int i = 0; i < numberOfAddresses; i++)
   {
     uint32_t value = distribution(generator);
     if (i > 0)
@@ -346,17 +348,17 @@ void augustusDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
   }
 }
 
-void uniformDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
+void uniformDistribution(std::vector<uint32_t> &values, int numberOfAddresses, uint32_t maxAddress)
 {
   // Random address generator (0 - 2^32) uniform distribution
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<long> dis(0, std::numeric_limits<long>::max());
+  std::uniform_int_distribution<long> dis(0, maxAddress);
   // std::uniform_int_distribution<long> dis(0, 4096);
   long address;
 
   // Generate 3000 random hexadecimal addresses
-  for (int i = 0; i < 3000; i++)
+  for (int i = 0; i < numberOfAddresses; i++)
   {
     address = dis(gen);
     values.push_back(address);
@@ -374,7 +376,7 @@ void normalDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
 
   // Generate 3000 addresses and store them in an array
   uint32_t address = 0x00000000;
-  for (int i = 0; i < 3000; i++)
+  for (int i = 0; i < numberOfAddresses; i++)
   {
     int increment = static_cast<int>(distribution(generator));
     if (address + increment < 0)
@@ -392,16 +394,16 @@ void normalDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
 
 void zipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
 {
-  // Random address generator (0 - 2^32) Zipf distribution
+  // Random address generator (0 - 2^18) Zipf distribution
   std::random_device rd;
   std::mt19937 generator(rd());
 
   // Define the parameters of the Zipf distribution
-  uint32_t n = 0xFFFF; // on 2^16 because 2^32 was really expensive for the harmonic number
-  double s = 1.5;      // Change this value to change the skew of the distribution (higher values = more skew(less probabilty of same ranks))
+  uint32_t n = 0x3FFFF; // on 2^18 because 2^32 was really expensive for the harmonic number
+  double alpha = 1.5;   // Change this value to change the skew of the distribution (higher values = more skew(less probabilty of same ranks))
 
-  /** A higher value of s produces more skewed distributions with fewer high-frequency rank values,
-   * while a lower value of s produces less skewed
+  /** A higher value of alpha produces more skewed distributions with fewer high-frequency rank values,
+   * while a lower value of alpha produces less skewed
    * distributions with more high-frequency rank values.
    */
 
@@ -410,22 +412,67 @@ void zipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
   std::cout << "Calculando H(n, s)..." << std::endl;
   for (uint32_t i = 1; i <= n; i++)
   {
-    H_n_s += 1.0 / std::pow(i, s);
+    H_n_s += 1.0 / std::pow(i, alpha);
   }
 
   // Generate addresses and store them in a vector
   uint32_t address;
   std::cout << "Generando direcciones..." << std::endl;
-  for (int i = 0; i < 3000; i++)
+  for (int i = 0; i < numberOfAddresses; i++)
   {
     // Generate a rank value according to the Zipf distribution
     double u = std::generate_canonical<double, 10>(generator);
     uint32_t k = 1;
-    double p = 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+    double p = 1.0 / ((double)k * std::pow(k, alpha)) / H_n_s;
     while (u > p && k < n)
     {
       k++;
-      p += 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+      p += 1.0 / ((double)k * std::pow(k, alpha)) / H_n_s;
+    }
+
+    // Compute the address corresponding to the rank value
+    address = k;
+    values.push_back(address);
+  }
+}
+
+void MZipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
+{
+  // Random address generator (0 - 2^18) MZipf distribution
+  std::random_device rd;
+  std::mt19937 generator(rd());
+
+  // Define the parameters of the MZipf distribution
+  uint32_t n = 0x3FFFF; // on 2^18 because 2^32 was really expensive for the harmonic number
+  double alpha = 0.5;   // Change this value to change the skew of the distribution (higher values = more skew(less probabilty of same ranks))
+  double beta = 2;
+
+  /** A higher value of alpha produces more skewed distributions with fewer high-frequency rank values,
+   * while a lower value of alpha produces less skewed
+   * distributions with more high-frequency rank values.
+   */
+
+  // Compute the harmonic number for H(n, s)
+  double H_n_s = 0;
+  std::cout << "Calculando H(n, s)..." << std::endl;
+  for (uint32_t i = 1; i <= n; i++)
+  {
+    H_n_s += 1.0 / std::pow(i, alpha);
+  }
+
+  // Generate addresses and store them in a vector
+  uint32_t address;
+  std::cout << "Generando direcciones..." << std::endl;
+  for (int i = 0; i < numberOfAddresses; i++)
+  {
+    // Generate a rank value according to the MZipf distribution
+    double u = std::generate_canonical<double, 10>(generator);
+    uint32_t k = 1;
+    double p = std::pow(k, -alpha) + beta;
+    while (u > p / H_n_s && k < n)
+    {
+      k++;
+      p += std::pow(k, -alpha) + beta;
     }
 
     // Compute the address corresponding to the rank value
@@ -449,16 +496,24 @@ void readBlocksFromStructure(int addressDistribution)
     addressDistributionNameFile = "augustus.csv";
     break;
   case 1:
-    uniformDistribution(values, numberOfAddresses);
+    uniformDistribution(values, numberOfAddresses, 0xFFFFFFFF);
     addressDistributionNameFile = "uniform2^32.csv";
     break;
   case 2:
+    uniformDistribution(values, numberOfAddresses, 0xFFFF);
+    addressDistributionNameFile = "uniform2^16.csv";
+    break;
+  case 3:
     normalDistribution(values, numberOfAddresses);
     addressDistributionNameFile = "normal.csv";
     break;
-  case 3:
+  case 4:
     zipfDistribution(values, numberOfAddresses);
     addressDistributionNameFile = "zipf.csv";
+    break;
+  case 5:
+    MZipfDistribution(values, numberOfAddresses);
+    addressDistributionNameFile = "mzipf.csv";
     break;
   default:
     augustusDistribution(values, numberOfAddresses);
