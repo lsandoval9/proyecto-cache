@@ -42,9 +42,9 @@ nlohmann::json config; // Configuracion del programa
 
 void printMenu();
 
-void setValuesFromCIN();
+void setValuesFromCIN(int &addressDistribution);
 
-void setValuesFromConfig();
+void setValuesFromConfig(int &addressDistribution);
 
 void initializeCache(long s_block, long s_cache, long n_ways, short replacementPolicy);
 
@@ -52,9 +52,17 @@ void finalizarPrograma();
 
 void imprimirInformacion();
 
-void readBlocksFromStructure();
+void readBlocksFromStructure(int addressDistribution);
 
 void writeFeatures();
+
+void augustusDistribution(std::vector<uint32_t> &values, int numberOfAddresses);
+
+void uniformDistribution(std::vector<uint32_t> &values, int numberOfAddresses);
+
+void normalDistribution(std::vector<uint32_t> &values, int numberOfAddresses);
+
+void zipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses);
 
 /**
  * Programa para emular el funcionamiento de una memoria cache para correspondencia directa y
@@ -64,6 +72,7 @@ int main(int argc, char const *argv[])
 {
 
   bool loadConfig = false;
+  int addressDistribution;
 
   if (argc > 1)
   {
@@ -83,20 +92,20 @@ int main(int argc, char const *argv[])
 
     cout << "Cargando configuracion..." << endl;
 
-    setValuesFromConfig();
+    setValuesFromConfig(addressDistribution);
 
-    readBlocksFromStructure();
+    readBlocksFromStructure(addressDistribution);
 
     writeFeatures();
 
     cout << endl;
-    
+
     imprimirInformacion();
   }
   else
   {
-    setValuesFromCIN();
-    readBlocksFromStructure();
+    setValuesFromCIN(addressDistribution);
+    readBlocksFromStructure(addressDistribution);
 
     while (input != 0)
     {
@@ -110,14 +119,14 @@ int main(int argc, char const *argv[])
       {
 
       case 1: // Imprimir prestaciones de la cache
-        readBlocksFromStructure();
+        readBlocksFromStructure(addressDistribution);
         break;
       case 2:
         writeFeatures();
         break;
       case 3: // Reiniciar valores
-        setValuesFromCIN();
-        readBlocksFromStructure();
+        setValuesFromCIN(addressDistribution);
+        readBlocksFromStructure(addressDistribution);
         break;
       case 4: // imprimir informacion del programa
         imprimirInformacion();
@@ -142,7 +151,7 @@ int main(int argc, char const *argv[])
  * @param s_cache Tamaño de la cache
  * @param n_ways Numero de vias
  */
-void setValuesFromCIN()
+void setValuesFromCIN(int &addressDistribution)
 {
   long s_block; // Tamaño del bloque en palabras de 32 bits
 
@@ -171,10 +180,14 @@ void setValuesFromCIN()
   std::cout << "> ";
   std::cin >> replacementPolicy;
 
+  std::cout << "Ingrese la politica de distribución de direcciones (0: Augustus, 1: Uniforme[2^32], 2: Normal, 3: Zipf[slow])" << endl;
+  std::cout << "> ";
+  std::cin >> addressDistribution;
+
   initializeCache(s_block, s_cache, n_ways, replacementPolicy);
 }
 
-void setValuesFromConfig()
+void setValuesFromConfig(int &addressDistribution)
 {
 
   // Abrir el archivo JSON
@@ -183,10 +196,11 @@ void setValuesFromConfig()
   // Analizar la cadena JSON
   config = json::parse(file);
 
-  long s_block = WORDS_PER_BLOCK;                   // Tamaño del bloque en palabras de 32 bits (4 bytes)
+  long s_block = WORDS_PER_BLOCK;                     // Tamaño del bloque en palabras de 32 bits (4 bytes)
   long s_cache = config["s_cache"];                   // Tamaño de la cache en KBs
   long n_ways = config["n_ways"];                     // Numero de vias
   short replacementPolicy = config["replace_policy"]; // Politica de reemplazo
+  addressDistribution = config["address_distribution"];
 
   initializeCache(s_block, s_cache, n_ways, replacementPolicy);
 
@@ -290,11 +304,8 @@ void imprimirInformacion()
   std::cout << "Profesor: Jose Canache" << endl;
 }
 
-void readBlocksFromStructure()
+void augustusDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
 {
-
-  globalSetAssociativeCache->clearCache();
-
   // Define el rango de valores
   uint32_t minValue = 0;
   uint32_t maxValue = 0xFFFFFFFF;
@@ -311,9 +322,8 @@ void readBlocksFromStructure()
   std::uniform_int_distribution<uint32_t> distribution(minValue, maxValue);
 
   // Genera valores aleatorios y llama a la función
-  std::vector<uint32_t> values;
   uint32_t previousValue = 0;
-  for (int i = 0; i < 5000; i++)
+  for (int i = 0; i < 3000; i++)
   {
     uint32_t value = distribution(generator);
     if (i > 0)
@@ -334,6 +344,124 @@ void readBlocksFromStructure()
     values.push_back(value);
     previousValue = value;
   }
+}
+
+void uniformDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
+{
+  // Random address generator (0 - 2^32) uniform distribution
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<long> dis(0, std::numeric_limits<long>::max());
+  // std::uniform_int_distribution<long> dis(0, 4096);
+  long address;
+
+  // Generate 3000 random hexadecimal addresses
+  for (int i = 0; i < 3000; i++)
+  {
+    address = dis(gen);
+    values.push_back(address);
+  }
+}
+
+void normalDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
+{
+  // Random address generator (0 - 2^32) normal distribution (favors nearby addresses)
+  std::random_device rd;
+  std::mt19937 generator(rd());
+
+  // Define a distribution that favors nearby addresses
+  std::normal_distribution<> distribution(0, 100);
+
+  // Generate 3000 addresses and store them in an array
+  uint32_t address = 0x00000000;
+  for (int i = 0; i < 3000; i++)
+  {
+    int increment = static_cast<int>(distribution(generator));
+    if (address + increment < 0)
+    {
+      increment = -static_cast<int>(address);
+    }
+    else if (address + increment > 0xFFFFFFFF)
+    {
+      increment = 0xFFFFFFFF - static_cast<int>(address);
+    }
+    address += static_cast<uint32_t>(increment);
+    values.push_back(address);
+  }
+}
+
+void zipfDistribution(std::vector<uint32_t> &values, int numberOfAddresses)
+{
+  // Random address generator (0 - 2^32) Zipf distribution
+  std::random_device rd;
+  std::mt19937 generator(rd());
+
+  // Define the parameters of the Zipf distribution
+  uint32_t n = 0xFFFF; // on 2^16 because 2^32 was really expensive for the harmonic number
+  double s = 1.5;      // Change this value to change the skew of the distribution (higher values = more skew(less probabilty of same ranks))
+
+  /** A higher value of s produces more skewed distributions with fewer high-frequency rank values,
+   * while a lower value of s produces less skewed
+   * distributions with more high-frequency rank values.
+   */
+
+  // Compute the harmonic number for H(n, s)
+  double H_n_s = 0;
+  std::cout << "Calculando H(n, s)..." << std::endl;
+  for (uint32_t i = 1; i <= n; i++)
+  {
+    H_n_s += 1.0 / std::pow(i, s);
+  }
+
+  // Generate addresses and store them in a vector
+  uint32_t address;
+  std::cout << "Generando direcciones..." << std::endl;
+  for (int i = 0; i < 3000; i++)
+  {
+    // Generate a rank value according to the Zipf distribution
+    double u = std::generate_canonical<double, 10>(generator);
+    uint32_t k = 1;
+    double p = 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+    while (u > p && k < n)
+    {
+      k++;
+      p += 1.0 / ((double)k * std::pow(k, s)) / H_n_s;
+    }
+
+    // Compute the address corresponding to the rank value
+    address = k;
+    values.push_back(address);
+  }
+}
+
+void readBlocksFromStructure(int addressDistribution)
+{
+  globalSetAssociativeCache->clearCache();
+
+  std::vector<uint32_t> values;
+  int numberOfAddresses = 3000;
+
+  switch (addressDistribution)
+  {
+  case 0:
+    augustusDistribution(values, numberOfAddresses);
+    break;
+  case 1:
+    uniformDistribution(values, numberOfAddresses);
+    break;
+  case 2:
+    normalDistribution(values, numberOfAddresses);
+    break;
+  case 3:
+    zipfDistribution(values, numberOfAddresses);
+    break;
+  default:
+    augustusDistribution(values, numberOfAddresses);
+    break;
+  }
+
+  ofstream outputFile("output.csv");
+  outputFile << "AccessCounter, HitRate" << endl;
 
   for (int i = 0; i < values.size(); i++)
   {
@@ -348,7 +476,11 @@ void readBlocksFromStructure()
 
     std::cout << std::endl
               << "-----------------" << std::endl;
+
+    outputFile << std::round(globalSetAssociativeCache->getHitRate() * 100) / 100 << ", " << i << endl;
   }
+
+  outputFile.close();
 
   double miss_rate = std::round(globalSetAssociativeCache->getMissRate() * 100) / 100;
 
