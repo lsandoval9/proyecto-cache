@@ -440,28 +440,34 @@ void readBlocksFromStructure(int addressDistribution)
 
   std::vector<uint32_t> values;
   int numberOfAddresses = 3000;
+  string addressDistributionNameFile;
 
   switch (addressDistribution)
   {
   case 0:
     augustusDistribution(values, numberOfAddresses);
+    addressDistributionNameFile = "augustus.csv";
     break;
   case 1:
     uniformDistribution(values, numberOfAddresses);
+    addressDistributionNameFile = "uniform2^32.csv";
     break;
   case 2:
     normalDistribution(values, numberOfAddresses);
+    addressDistributionNameFile = "normal.csv";
     break;
   case 3:
     zipfDistribution(values, numberOfAddresses);
+    addressDistributionNameFile = "zipf.csv";
     break;
   default:
     augustusDistribution(values, numberOfAddresses);
+    addressDistributionNameFile = "augustus.csv";
     break;
   }
 
-  ofstream outputFile("output.csv");
-  outputFile << "AccessCounter, HitRate" << endl;
+  ofstream outputFile(addressDistributionNameFile);
+  outputFile << "HitRate, AccessCounter" << endl;
 
   for (int i = 0; i < values.size(); i++)
   {
