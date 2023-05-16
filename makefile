@@ -7,7 +7,7 @@ LIBS = -lm
 # Compilador utilizado, por ejemplo icc, pgcc , gcc
 CC = g++
 # Banderas del compilador, por ejemplo -DDEBUG -02 -03 -wall -g
-CFLAGS = -gcc -std=c++11
+CFLAGS = -std=c++11
 
 # Palabras que usa el Makefile que podrian ser el nombre de un Programa
 .PHONY: default all clean
@@ -20,12 +20,12 @@ all: default
 OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 
 # Incluye los archivos.h que estan en el directorio actual
-HEADERS = $(wildcard *.h)
+HEADERS = $(wildcard *.hpp) **/*.hpp
 
 # compila automaticamente solo archivos fuente que se han Modificado
 # $< es el primer prerrequisito, generalmente el archivofuente
 # $@ nombre del archivo que se esta generando, archivo objeto
-%.o: %.c $(HEADERS)
+%.o: %.cpp $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Preserva archivos intermedios
@@ -37,8 +37,8 @@ $(TARGET): $(OBJECTS)
 
 # Borra archivos .o
 clean:
-	-rm -f *.o core
+	-rm -f *.o core RUN.out main arboles
 
 # Borra archivos .o y el ejecutable
 cleanall: clean
-	-rm -f $(TARGET)
+	-rm -f $(TARGET) RUN.out main arboles

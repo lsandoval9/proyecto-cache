@@ -486,7 +486,7 @@ void readBlocksFromStructure(int addressDistribution)
   globalSetAssociativeCache->clearCache();
 
   std::vector<uint32_t> values;
-  int numberOfAddresses = 3000;
+  int numberOfAddresses = N_ADDRESSES;
   string addressDistributionNameFile;
 
   switch (addressDistribution)
