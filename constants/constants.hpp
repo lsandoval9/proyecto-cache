@@ -21,3 +21,9 @@
 #define MAX_ADDRESS 0xFFFFFFFF // Direccion maxima
 
 #endif
+
+#ifndef N_ADDRESSES
+
+#define N_ADDRESSES 50000 // Numero de direcciones a generar
+
+#endif
