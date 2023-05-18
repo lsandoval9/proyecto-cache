@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install build tools
 RUN apt-get update && \
-    apt-get install -y g++
+    apt-get install -y g++ nano
 
 # Copy source code and compile
 COPY . .
