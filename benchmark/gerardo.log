@@ -1,0 +1,53 @@
+
+| Gerardo | 3,20 GHz, 2 nucleos | 8GB RAM | 50000 casos
+
+----------------------------------- 
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 0
+}
+Execution time: 25.66 seconds
+CPU usage: 4.21%
+RAM usage: 26.57 MB
+----------------------------------- 
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 1
+}
+Execution time: 25.07 seconds
+CPU usage: 4.79%
+RAM usage: 26.64 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 2
+}
+Execution time: 25.37 seconds
+CPU usage: 4.73%
+RAM usage: 25.41 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 3
+}
+Execution time: 25.68 seconds
+CPU usage: 4.52%
+RAM usage: 25.85 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 5
+}
+Execution time: 27.03 seconds
+CPU usage: 4.85%
+RAM usage: 25.28 MB
