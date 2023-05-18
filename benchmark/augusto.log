@@ -1,5 +1,62 @@
 | Augusto | 4 nucleos a 3,90 Ghz | 50000 casos
 
-Execution time: 18.15 seconds
-CPU usage: 6.94%
-RAM usage: 25.56 MB
+----------------------------------- 
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 0
+}
+Execution time: 16.70 seconds
+CPU usage: 5.51%
+RAM usage: 26.87 MB
+----------------------------------- 
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 1
+}
+Execution time: 14.88 seconds
+CPU usage: 4.84%
+RAM usage: 26.82 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 2
+}
+Execution time: 14.05 seconds
+CPU usage: 4.84%
+RAM usage: 25.84 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 3
+}
+Execution time: 17.01 seconds
+CPU usage: 5.64%
+RAM usage: 25.97 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 4
+}
+Execution time: 250.92 seconds
+CPU usage: 0.28%
+RAM usage: 25.89 MB
+-----------------------------------
+{
+  "s_cache": 32,
+  "n_ways": 8,
+  "replace_policy": 0,
+  "address_distribution": 5
+}
+Execution time: 16.80 seconds
+CPU usage: 5.60%
+RAM usage: 25.50 MB
