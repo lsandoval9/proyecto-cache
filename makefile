@@ -37,8 +37,8 @@ $(TARGET): $(OBJECTS)
 
 # Borra archivos .o
 clean:
-	-rm -f *.o core RUN.out main arboles
+	-rm -f *.o core
 
 # Borra archivos .o y el ejecutable
 cleanall: clean
-	-rm -f $(TARGET) RUN.out main arboles
+	-rm -f $(TARGET)
