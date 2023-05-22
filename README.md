@@ -71,7 +71,7 @@ ejemplo del archivo:
 }
 ```
 
-para indicarle al programa que lea el archivo en vez de solicitar los valores de la cache al usuario, se debe ejecutar el programa con un argumento booleano donde 1 es para leer el archivo y 0 para no leerlo, por ejemplo:
+para indicarle al programa que lea el archivo en vez de solicitar los valores de la cache al usuario, se debe ejecutar el programa con un argumento booleano donde 1 es para leer el archivo y 0. Por ejemplo:
 
 ```bash
 EJECUTAR.sh 1
@@ -112,3 +112,11 @@ La tercera opcion permite al usuario cambiar los valores del tamaño y las vias 
 La cuarta opcion imprimira informacion sobre el programa.
 
 La quinta y ultima opción finalizara el programa.
+
+## Benchmark
+
+Se ha creado un script en Python 3 para correr el ejecutable del archivo llamado 'RUN.out' [(ver arriba como ejecutar el programa)](#compilacion). El script ejecuta el programa como un proceso y mide el uso del CPU, memoria RAM, y el tiempo real de ejecutacion (descartando el tiempo de usuario y del sistema).
+
+**NOTA**: Dependiendo de la version de Python, puede que el script no se ejecute, principalmente en versiones muy actuales.
+
+Tambien puede que en ciertas versiones el script mida el tiempo absoluto del programa, descartando el tiempo de la salida estandar (cout de c++, por ejemplo), la cual es diferida, por lo que el tiempo puede ser mucho menor que en los casos de prueba.
