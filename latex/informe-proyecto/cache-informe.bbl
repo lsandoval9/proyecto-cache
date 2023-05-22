@@ -1,0 +1,154 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{none/global//global/global}
+  \entry{darscheid_maximum-entropy_2018}{article}{}
+    \name{author}{3}{}{%
+      {{hash=DP}{%
+         family={Darscheid},
+         familyi={D\bibinitperiod},
+         given={Paul},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=GgSA}{%
+         prefix={Guthke\bibnamedelima (geb.},
+         prefixi={G\bibinitperiod\bibinitdelim g\bibinitperiod},
+         family={Schöniger)},
+         familyi={S\bibinitperiod},
+         given={Anneli},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=EU}{%
+         family={Ehret},
+         familyi={E\bibinitperiod},
+         given={Uwe},
+         giveni={U\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{DPSAGgEU1}
+    \strng{fullhash}{DPSAGgEU1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{abstract}{%
+    When constructing discrete (binned) distributions from samples of a data
+  set, applications exist where it is desirable to assure that all bins of the
+  sample distribution have nonzero probability. For example, if the sample
+  distribution is part of a predictive model for which we require returning a
+  response for the entire codomain, or if we use Kullback–Leibler divergence
+  to measure the (dis-)agreement of the sample distribution and the original
+  distribution of the variable, which, in the described case, is inconveniently
+  infinite. Several sample-based distribution estimators exist which assure
+  nonzero bin probability, such as adding one counter to each zero-probability
+  bin of the sample histogram, adding a small probability to the sample pdf,
+  smoothing methods such as Kernel-density smoothing, or Bayesian approaches
+  based on the Dirichlet and Multinomial distribution. Here, we suggest and
+  test an approach based on the Clopper–Pearson method, which makes use of
+  the binominal distribution. Based on the sample distribution, confidence
+  intervals for bin-occupation probability are calculated. The mean of each
+  confidence interval is a strictly positive estimator of the true
+  bin-occupation probability and is convergent with increasing sample size. For
+  small samples, it converges towards a uniform distribution, i.e., the method
+  effectively applies a maximum entropy approach. We apply this nonzero method
+  and four alternative sample-based distribution estimators to a range of
+  typical distributions (uniform, Dirac, normal, multimodal, and irregular) and
+  measure the effect with Kullback–Leibler divergence. While the performance
+  of each method strongly depends on the distribution type it is applied to, on
+  average, and especially for small sample sizes, the nonzero, the simple
+  “add one counter”, and the Bayesian Dirichlet-multinomial model show very
+  similar behavior and perform best. We conclude that, when estimating
+  distributions without an a priori idea of their shape, applying one of these
+  methods is favorable.%
+    }
+    \verb{doi}
+    \verb 10.3390/e20080601
+    \endverb
+    \field{shortjournal}{Entropy}
+    \field{title}{A Maximum-Entropy Method to Estimate Discrete Distributions
+  from Samples Ensuring Nonzero Probabilities}
+    \field{volume}{20}
+    \verb{file}
+    \verb Texto completo:C\:\\Users\\Gerard\\Zotero\\storage\\ADSIBP67\\Darsche
+    \verb id et al. - 2018 - A Maximum-Entropy Method to Estimate Discrete Dist
+    \verb .pdf:application/pdf
+    \endverb
+    \field{journaltitle}{Entropy}
+    \field{day}{13}
+    \field{month}{08}
+    \field{year}{2018}
+  \endentry
+
+  \entry{hefeeda_traffic_2008}{article}{}
+    \name{author}{2}{}{%
+      {{hash=HM}{%
+         family={Hefeeda},
+         familyi={H\bibinitperiod},
+         given={Mohamed},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=SO}{%
+         family={Saleh},
+         familyi={S\bibinitperiod},
+         given={Osama},
+         giveni={O\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HMSO1}
+    \strng{fullhash}{HMSO1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{abstract}{%
+    Peer-to-peer (P2P) file sharing systems generate a major portion of the
+  Internet traffic, and this portion is expected to increase in the future. We
+  explore the potential of deploying proxy caches in different autonomous
+  systems ({ASes}) with the goal of reducing the cost incurred by Internet
+  service providers and alleviating the load on the Internet backbone. We
+  conduct an eight-month measurement study to analyze the P2P traffic
+  characteristics that are relevant to caching, such as object popularity,
+  popularity dynamics, and object size. Our study shows that the popularity of
+  P2P objects can be modeled by a Mandelbrot-Zipf distribution, and that
+  several workloads exist in P2P traffic. Guided by our findings, we develop a
+  novel caching algorithm for P2P traffic that is based on object segmentation,
+  and proportional partial admission and eviction of objects. Our trace-based
+  simulations show that with a relatively small cache size, a byte hit rate of
+  up to 35\% can be achieved by our algorithm, which is close to the byte hit
+  rate achieved by an off-line optimal algorithm with complete knowledge of
+  future requests. Our results also show that our algorithm achieves a byte hit
+  rate that is at least 40\% more, and at most triple, the byte hit rate of the
+  common Web caching algorithms. Furthermore, our algorithm is robust in face
+  of aborted downloads, which is a common case in P2P systems.%
+    }
+    \verb{doi}
+    \verb 10.1145/1514016.1514033
+    \endverb
+    \field{pages}{1447\bibrangedash 1460}
+    \field{shortjournal}{{IEEE}/{ACM} Trans. Netw.}
+    \field{title}{Traffic Modeling and Proportional Partial Caching for
+  Peer-to-Peer Systems}
+    \field{volume}{16}
+    \verb{file}
+    \verb Full Text PDF:C\:\\Users\\Gerard\\Zotero\\storage\\W82C9QQ8\\Hefeeda
+    \verb y Saleh - 2008 - Traffic Modeling and Proportional Partial Caching .p
+    \verb df:application/pdf
+    \endverb
+    \field{journaltitle}{{IEEE}/{ACM} Trans. Netw.}
+    \field{day}{01}
+    \field{month}{12}
+    \field{year}{2008}
+  \endentry
+\enddatalist
+\endinput

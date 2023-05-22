@@ -1,0 +1,6 @@
+cache-informe-figure0.pdf: mzipf.csv
+cache-informe-figure0.pdf: augustus.csv
+cache-informe-figure0.pdf: uniform2^16.csv
+cache-informe-figure0.pdf: uniform2^32.csv
+cache-informe-figure0.pdf: normal.csv
+cache-informe-figure0.pdf: zipf.csv
