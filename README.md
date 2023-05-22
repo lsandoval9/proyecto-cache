@@ -11,6 +11,11 @@
 - **Luis A. Sandoval - V26.781.082**
 - **Gerardo Diaz - V30.388.971**
 
+<br>
+
+## <u>**NOTA**</u>: Los archivos LaTex estan en la carpeta LaTex. En la raiz estan los PDFs finales y en cada carpeta el codigo fuente de cada uno.
+
+<br>
 ## Introducción
 
 El programa esta diseñado para emular el funcionamiento de una memoria cache sencilla. Permite cambiar valores de forma dinamica y generar reportes.
